@@ -242,5 +242,187 @@ pets:
 pets: [cat,dog,pig]
 ```
 
+### 3、配置文件值注入
 
+Persion.java
+
+```java
+/**
+ * 将配置文件中配置的每一个属性的值，映射到这个组件中
+ * @ConfigurationProperties,告诉SpringBoot将本类中的所有的属性和配置文件中相关的配置进行绑定，
+ * prefix = "persion"，配置文件中哪个下面的所有属性进行一一映射
+ *
+ * 只有这个组件是容器中的组件，才能使用容器提供的@ConfigurationProperties功能
+ */
+@Component
+@ConfigurationProperties(prefix = "persion")
+public class Person{
+    private String lastName;
+    private Integer age;
+    private Boolean boss;
+    private Date birth;
+    
+    private Map<String,Object> maps;
+    private List<Object> lists;
+    private Dog dog;
+}
+```
+
+Dog.java
+
+```java
+public class Dog{
+    private String name;
+    private Integer age;
+}
+```
+
+application.yml
+
+```yaml
+persion:
+  lastName: zhangsan
+  age: 18
+  boss: false
+  birth: 2017/12/12
+  maps:{k1: v1,k2: 12}
+  lists:
+   - lisi
+   - zhaoliu
+  dog:
+   name: 小狗
+   age: 2
+```
+
+pom.xml
+
+```xml
+<!--导入配置文件处理器，配置文件进行绑定就会有提示-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-configuration-processor</artifactId>
+    <optional>true</optional>
+</dependency>
+```
+
+#### 1、properties配置文件在idea中默认utf-8，可能会乱码
+
+application.properties
+
+```properties
+# idea，properties配置文件使用的是utf-8
+# 配置person的值
+person.lastname=张三
+person.age=18
+person.boss=false
+person.birth=2017/12/12
+person.maps.k1=v1
+person.maps.k2=14
+person.lists=a,b,c
+person.dog.name=dog
+penson.dog.age=15
+```
+
+Persion.java
+
+```java
+/**
+ * 将配置文件中配置的每一个属性的值，映射到这个组件中
+ * @ConfigurationProperties,告诉SpringBoot将本类中的所有的属性和配置文件中相关的配置进行绑定，
+ * prefix = "persion"，配置文件中哪个下面的所有属性进行一一映射
+ *
+ * 只有这个组件是容器中的组件，才能使用容器提供的@ConfigurationProperties功能
+ */
+@Component
+// @ConfigurationProperties(prefix = "persion")
+public class Person{
+    
+    /**
+     * <bean class="Person">
+     *		<property name="lastName" value="字面量/${key}从环境变量、配置文件中获取值/#{SpEL}"></property>
+     * </bean>
+     */
+    @Value("${pension.lastname}")
+    private String lastName;
+    @Value("#{11*2}")
+    private Integer age;
+    @Value("true")
+    private Boolean boss;
+    private Date birth;
+    
+    private Map<String,Object> maps;
+    private List<Object> lists;
+    private Dog dog;
+}
+```
+
+#### 2、@Value获取值和@ConfigurationProperties获取值比较
+
+|                      | @ConfigurationProperties | @Value     |
+| -------------------- | ------------------------ | ---------- |
+| 功能                 | 批量注入配置文件中的属性 | 一个个指定 |
+| 松散绑定（松散语法） | 支持                     | 不支持     |
+| SpEL                 | 不支持                   | 支持       |
+| JSR303数据校验       | 支持                     | 不支持     |
+| 复杂类型封装         | 支持                     | 不支持     |
+
+```java
+@Component
+@ConfigurationProperties(prefix = "persion")
+@Validated
+public class Person{
+    //lastName必须是邮箱格式
+    @Email
+    private String lastName;
+    private Integer age;
+    private Boolean boss;
+    private Date birth;
+    
+    private Map<String,Object> maps;
+    private List<Object> lists;
+    private Dog dog;
+}
+```
+
+配置文件yml还是properties他们都能获取到值；
+
+如果说，我们只是在某个业务逻辑中需要获取一下配置文件中的某项值，使用@Value;
+
+如果说，我们专门编写了一个javaBean来和配置文件进行映射，我们就直接使用@ConfigurationProperties
+
+HelloController.java
+
+```java
+@RestController
+public class HelloController{
+    
+    @Value("${person.last-name}")
+    private String name;
+    
+    @RequestMapping("/sayHello")
+    public String sayHello(){
+        return "Hello" + name;
+    }
+}
+```
+
+#### 3、配置文件注入值数据校验
+
+```java
+@Component
+@ConfigurationProperties(prefix = "persion")
+@Validated
+public class Person{
+    //lastName必须是邮箱格式
+    @Email
+    private String lastName;
+    private Integer age;
+    private Boolean boss;
+    private Date birth;
+    
+    private Map<String,Object> maps;
+    private List<Object> lists;
+    private Dog dog;
+}
+```
 

@@ -426,3 +426,177 @@ public class Person{
 }
 ```
 
+#### 4、@PropertySource & @ImportResource
+
+**@PropertySource**：加载指定的配置文件
+
+Person.java
+
+```java
+/**
+ * @ConfigurationProperties(prefix = "persion")默认从全局配置文件中获取值
+ * prefix = "persion"，配置文件中哪个下面的所有属性进行一一映射
+ *
+ */
+@PropertySource(value = {"classpath:person.properties"})
+@Component
+@ConfigurationProperties(prefix = "persion")
+public class Person{
+    private String lastName;
+    private Integer age;
+    private Boolean boss;
+    private Date birth;
+    
+    private Map<String,Object> maps;
+    private List<Object> lists;
+    private Dog dog;
+}
+```
+
+person.properties
+
+```properties
+person.lastname=李四
+person.age=18
+person.boss=false
+person.birth=2017/12/12
+person.maps.k1=v1
+person.maps.k2=14
+person.lists=a,b,c
+person.dog.name=dog
+penson.dog.age=15
+```
+
+@**ImportResource**：导入Spring配置文件，让配置文件里面的内容生效；
+
+SpringBoot里面没有Spring配置文件，我们自己编写的配置文件也不能自动识别；
+
+想让Spring的配置文件生效，加载进来；@**ImportResource**标注在一个配置类上
+
+beans.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="helloService" class="com.example.demo.service.HelloService"></bean>
+</beans>
+```
+
+DemoApplication.java
+
+```java
+@ImportResource(locations = {"classpath:beans.xml"})
+// 导入Spring的配置文件让其生效
+@SpringBootApplication
+public class DemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+```
+
+
+
+不来编写Spring的配置文件
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="helloService" class="com.example.demo.service.HelloService"></bean>
+</beans>
+```
+
+Springboot推荐给容器中添加组件的方式：推荐使用全注解的方式
+
+1、配置类 == Spring配置文件
+
+2、使用@Bean给容器中添加组件
+
+```java
+/**
+ * @Configuration：指明当前类是一个配置类；就是来替代之前的Spring配置文件
+ * 在配置文件中用<bean></bean>标签添加组件
+ */
+@Configuration
+public class MyAppConfig {
+
+    // 将方法的返回值添加到容器中，容器中这个组件默认的id就是方法名
+    @Bean
+    public HelloService helloService() {
+        return new HelloService();
+    }
+}
+```
+
+### 4、配置文件占位符
+
+#### 1、随机数
+
+```java
+random、value、(random.int)、${random.long}、random.int(10)、{(random.int[1024,65536])}
+```
+
+#### 2、占位符获取之前配置的值，如果没有可以使用：指定默认值
+
+```properties
+person.lastname=zhangsan${random.uuid}
+person.age=${random.int}
+person.boss=false
+person.birth=2017/12/12
+person.maps.k1=v1
+person.maps.k2=14
+person.lists=a,b,c
+person.dog.name=${person.hello:hello}_dog
+penson.dog.age=15
+```
+
+### 5、Profile
+
+#### 1、多Profile文件
+
+我们在主配置文件编写时，文件名可以是application-{profile}.properties/yml
+
+默认使用application.properties的配置
+
+#### 2、yml支持多文档快方式
+
+```yaml
+server:
+  port: 8081
+spring:
+  profiles:
+    active: dev
+---
+server:
+  port: 8083
+spring:
+  profiles: dev
+---
+server:
+  port: 8084
+spring:
+  profiles: prod  #指定属于哪个环境
+```
+
+#### 3、激活指定Profile
+
+​		1、在配置文件中指定  spring.profiles.active=dev
+
+​		2、命令行：
+
+​			java -jar springboot-02-config-0.0.1.SNAPSHOT.jar --spring.profiles.active=dev
+
+ 		  可以直接在测试的时候，配置传入命令行参数
+
+​      3、虚拟机参数：
+
+​			-Dspring.profile.active=dev
+
+### 6、

@@ -599,4 +599,80 @@ spring:
 
 ​			-Dspring.profile.active=dev
 
-### 6、
+### 6、配置文件加载位置
+
+SpringBoot启动会扫描以下位置的application.properties或者application.yml文件作为SpringBoot的默认配置文件
+
+- file: ./config/
+
+- file: ./
+
+- classpath: /config/
+
+- classpath: /
+
+  **优先级由高到低**，高优先级的配置会覆盖低优先级的配置；
+
+  SpringBoot会从这四个位置全部加载主配置文件；**互补配置**；
+
+==我们还可以通过spring.config.location来改变默认的配置文件位置==
+
+项目打包以后，我们可以使用命令行参数的形式，启动项目的时候来指定配置文件的位置；指定的配置文件和默认加载的这些配置文件会共同起作用，形成互补配置；
+
+### 7、外部配置加载顺序
+
+==**SpringBoot也可以从以下位置加载配置；优先级从高到低；高优先级的配置覆盖低优先级的配置，所有的配置会形成互补配置**==
+
+1. **命令行参数**
+
+   java -jar spring-boot-02-config-02-0.0.1-SNAPSHOT.jar --server.port=8087 --server.context-path=/abc
+
+   多个配置用空格分开；--配置项=值
+
+2. 来自java:comp/env的NDI属性
+
+3. java系统属性(System.getProperties())
+
+4. 操作系统环境变量
+
+5. RandomValuePropertySource配置的random.*属性值
+
+   ==**由jar包外向jar包内进行寻找；**==
+
+   ==**优先加载带profile**==
+
+6. **jar包外部的application-{profile}.properties或application.yml(带spring.profile)配置文件**
+
+7. **jar包内部的application-{profile}.properties或application.yml(带spring.profile)配置文件**
+
+   ==**再来加载不带profile**==
+
+8. **jar包外部的application.properties或application.yml(不带spring.profile)配置文件**
+
+9. **jar包内部的application.properties或application.yml(不带spring.profile)配置文件**
+
+10. @Configuration注解类上的@PropertySource
+
+11. 通过SpringApplication.setDefaultProperties指定的默认属性
+
+### 8、自动配置原理
+
+**自动配置原理：**
+
+1）SpringBoot启动的时候加载主配置类，开启了自动配置功能==**@EnableAutoConfiguration**==
+
+2）@EnableAutoConfiguration作用：
+
+​		@EnableAutoConfigurationImportSelector给容器中导入一些组件？
+
+​		可以查看selectImports()方法的内容：
+
+```java
+List<String> configurations = this.getCandidateConfigurations(annotationMetadata, attributes);
+// 获取候选的配置
+```
+
+```java
+
+```
+

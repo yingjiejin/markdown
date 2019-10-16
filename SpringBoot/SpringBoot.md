@@ -1023,4 +1023,110 @@ SpringBoot使用它来做日志功能：
 
 总结：
 
-​	1）、SpringBoot底层也是使用slf4j
+​	1）、SpringBoot底层也是使用slf4j+logback的方式进行日志记录；
+
+​	2）、SpringBoot也把其他的日志都替换成了slf4j；
+
+​	3）、中间替换包？
+
+```java
+public abstract class LogFactory {
+    static String UNSUPPORTED_OPERATION_IN_JCL_OVER_SLF4J = "http://www.slf4j.org/codes.html#unsupported_operation_in_jcl_over_slf4j";
+    static LogFactory logFactory = new SLF4JLogFactory();
+}
+```
+
+![transferpackage](F:\markdown\SpringBoot\images\transferpackage.png)
+
+​	4）、如果我们要引入其他框架？一定要把这个框架的日志依赖移除掉？
+
+​			Spring框架用的commons-logging：	
+
+```xml
+<dependency>
+	<groupId>org.springframework</groupId>
+	<artifactId>spring-core</artifactId>
+	<exclusions>
+		<exclusion>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+		</exclusion>
+	</exclusions>
+</dependency>
+```
+
+**SpringBoot能自动适配所有的日志，而且底层使用slf4j+logback的方式记录日志，引入其他框架的时候，只需把这个框架依赖的日志框架排除掉；**
+
+## 4、日志使用
+
+### 1、默认配置
+
+SpringBoot默认帮我们配置好了日志；
+
+```java
+// 记录器
+Logger logger = LoggerFactory.getLogger(getClass());
+
+@Test
+public void contextLoads() {
+
+	// 日志级别：
+	// 由低到高 trace<debug<info<warn<error
+	// 可以调整输出的日志级别：日志就只会在这个级别以后的高级别生效
+	logger.trace("这是trace日志...");
+	logger.debug("这是debug日志...");
+	// SpringBoot默认给我们使用的是info级别的，没有指定级别的就用SpringBoot默认规定的级别，root级别
+	logger.info("这是info日志...");
+	logger.warn("这是warn日志...");
+	logger.error("这是error日志...");
+}
+```
+
+
+
+
+
+```xml
+<!--
+	日志输出格式：
+		%d 表示日期时间，
+		%thread 表示线程名，
+		%-5level：级别从左显示5个字符宽度
+		%logger{50} 表示logger名字最长50个字符，否则按照句点分割
+		%msg：日志消息
+		%n 是换行符
+-->
+%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n
+```
+
+SpringBoot修改日志的默认配置
+
+```properties
+# 不指定路径在当前项目下生成springboot.log日志
+# 可以指定完整的路径；
+logging.file=E:/springboot.log
+# 在当前磁盘的根路径下创建spring文件夹和里面的log文件夹；使用spring.log作为默认文件
+logging.path=/spring/log
+
+# 在控制台输出的日志的格式
+logging.pattern.console=%d{yyyy-MM-dd}[%thread] %-5level %logger{50} - %msg%n
+# 指定文件中日志输出的格式
+logging.pattern.file=%d{yyyy-MM-dd} === [%thread] === %-5level === %logger{50} === %msg%n
+```
+
+| logging.file | logging.path | Example  | Description                      |
+| ------------ | ------------ | -------- | -------------------------------- |
+| {none}       | {none}       |          | 只在控制台输出                   |
+| 指定文件名   | {none}       | my.log   | 输出日志到my.log文件             |
+| {none}       | 指定目录     | /var/log | 输出到指定目录的spring.log文件中 |
+
+### 2、指定配置
+
+给类路径下每个日志框架放上自己的配置文件即可；SpringBoot就不使用他默认配置了；
+
+| Logging System           | Customization                                                |
+| ------------------------ | ------------------------------------------------------------ |
+| Logback                  | logback-spring.xml，logback-spring.groovy，logback.xml Or logback.groovy |
+| Log4j2                   | log4j2-spring.xml Or log4j2.xml                              |
+| JDK（java.util.Logging） | logging.properties                                           |
+

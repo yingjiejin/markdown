@@ -1130,3 +1130,70 @@ logging.pattern.file=%d{yyyy-MM-dd} === [%thread] === %-5level === %logger{50} =
 | Log4j2                   | log4j2-spring.xml Or log4j2.xml                              |
 | JDK（java.util.Logging） | logging.properties                                           |
 
+logback.xml：直接就被日志框架识别了；
+
+logback-spring.xml：日志框架就不直接加载日志的配置项，由SpringBoot解析日志配置，可以使用SpringBoot的高级Profile功能
+
+```xml
+<springProfile name="staging">
+    <!-- configuration to be enabled when the "staging" profile is active -->
+    可以指定某段配置只在某个环境下生效
+</springProfile>
+```
+
+否则
+
+```java
+no applicable action for [springProfile]
+```
+
+## 5、切换日志框架
+
+可以按照slf4j的日志适配图，进行相关的切换；
+
+slf4j+log4j的方式；
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <exclusions>
+    	<exclusion>
+        	<groupId>ch.qos.logback</groupId>
+    		<artifactId>logback</artifactId>
+        </exclusion>
+        <exclusion>
+        	<groupId>org.slf4j</groupId>
+    		<artifactId>log4j-over-slf4j</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<dependency>
+	<groupId>org.slf4j</groupId>
+    <artifactId>slf4j-log4j12</artifactId>
+</dependency>
+```
+
+
+
+切换为log4j2
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <exclusions>
+    	<exclusion>
+        	<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-log4j2</artifactId>
+</dependency>
+```
+

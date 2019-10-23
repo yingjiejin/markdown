@@ -1442,32 +1442,162 @@ Simple expressions:(表达式语法)
     	@{/order/process(execId=${execId},execType='FAST')}
     Fragment Expressions: ~{...}：片段引用表达式
     	<div th:insert="~{commons :: main}">...</div>
-Literals
+Literals: (字面量)
     Text literals: 'one text' , 'Another one!' ,…
     Number literals: 0 , 34 , 3.0 , 12.3 ,…
     Boolean literals: true , false
     Null literal: null
     Literal tokens: one , sometext , main ,…
-Text operations:
+Text operations:(文本操作)
     String concatenation: +
     Literal substitutions: |The name is ${name}|
-    Arithmetic operations:
+Arithmetic operations:(数学运算)
     Binary operators: + , - , * , / , %
     Minus sign (unary operator): -
-    Boolean operations:
+Boolean operations:(布尔运算)
     Binary operators: and , or
     Boolean negation (unary operator): ! , not
-Comparisons and equality:
-Comparators: > , < , >= , <= ( gt , lt , ge , le )
-Equality operators: == , != ( eq , ne )
-Conditional operators:
-If-then: (if) ? (then)
-If-then-else: (if) ? (then) : (else)
-Default: (value) ?: (defaultvalue)
+Comparisons and equality:(比较运算)
+    Comparators: > , < , >= , <= ( gt , lt , ge , le )
+    Equality operators: == , != ( eq , ne )
+Conditional operators:(条件运算，支持三元运算符)
+    If-then: (if) ? (then)
+    If-then-else: (if) ? (then) : (else)
+    Default: (value) ?: (defaultvalue)
 Special tokens:
-
-No-Operation:
+	No-Operation: _
 ```
 
+### 4、SpringMVC自动配置
 
+#### 1、SpringMVC autoConfigure
 
+SpringBoot自动配置好了SpringMVC
+
+以下是SpringBoot对SpringMVC的默认配置：
+
+- Inclusion of ContentNegotiatingViewResolver and BeanNameViewResolver beans.
+
+  - 自动配置了ViewResolver(视图解析器：根据方法的返回值得到视图对象（View），视图对象决定如何渲染（转发？重定向？）)
+  - ContentNegotiatingViewResolver：组合所有的视图解析器的；
+  - ==如何定制：我们可以自己给容器中添加一个视图解析器；自动的将其组合进来；==
+
+- Support for serving static resources, including support for Webjars(see below). 静态资源文件夹路径webjars
+
+- Static index.html support. 静态首页访问
+
+- Custom Favicon support (see below). favicon.ico
+
+- 自动注册了 Converter, GenericConverter, Formatter beans.
+
+  - Converter：转换器；public String hello(User user)：类型转换使用Converter
+
+  - Formatter：格式化器；2019-10-23===Date；
+
+    ```java
+    @Bean
+    @ConditionalOnProperty(prefix = "spring.mvc", name = "date-format")//在文件中配置日期格式化的规则
+    public Formatter<Date> dateFormatter() {
+    	return new DateFormatter(this.mvcProperties.getDateFormat()); //日期格式化组件
+    }
+    ```
+
+  ==自己添加的格式化器转换器，我们只需要放在容器中即可==
+
+- Support for HttpMessageConverters (see below).
+
+  - HttpMessageConverters：SpringMVC用来转换HTTP请求和响应的；User---json；
+
+  - HttpMessageConverters 是从容器中确定；获取所有HttpMessageConverters；
+
+    ==自己给容器中添加HttpMessageConverters，只需要将自己的组件注册在容器中（@Bean，@Component）==
+
+- Automatic registration for MessageCodesResolver (see below).定义错误代码生成规则
+
+- Automatic use of a ConfigurableWebBindingInitializer bean (see below).
+
+  ==我们可以配置一个ConfigurableWebBindingInitializer来替换默认的；（添加到容器）==
+
+```xml
+初始化WebDataBinder:
+请求数据===JavaBean；
+```
+
+**org.springframework.boot.autoconfigure.web：web的所有自动配置场景**
+
+#### 2、扩展SpringMVC
+
+```xml
+<mvc:view-controller path="/hello" view-name="success">
+<mvc:interceptors>
+    <mvc:interceptor>
+        <mvc:mapping path="/hello"/>
+        <bean></bean>
+    </mvc:interceptor>
+</mvc:interceptors>
+```
+
+==**编写一个配置类（@Configuration），是WebMvcConfigurerAdapter类型；不能标注@EnableWebMvc**==
+
+既保留了所有的自动配置，也能用我们扩展的配置；
+
+```java
+// 使用WebMvcConfigurerAdapter可以来扩展SpringMVC的功能
+@Configuration
+public class MyMvcConfig extends WebMvcConfigurerAdapter {
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        // super.addViewControllers(registry);
+        // 浏览器发送/jyj请求来到success
+        registry.addViewController("/jyj").setViewName("success");
+    }
+}
+```
+
+原理：
+
+​		1）、WebMvcAutoConfiguration是SpringMVC的自动配置类
+
+​		2）、在做其他自动配置时会导入@Import(**EnableWebMvcConfiguration**.class)
+
+```java
+@Configuration
+public static class EnableWebMvcConfiguration extends DelegatingWebMvcConfiguration {}
+
+private final WebMvcConfigurerComposite configurers = new WebMvcConfigurerComposite();
+//从容器中获取所有的WebMvcConfigurer
+@Autowired(required = false)
+public void setConfigurers(List<WebMvcConfigurer> configurers) {
+    if (!CollectionUtils.isEmpty(configurers)) {
+    	this.configurers.addWebMvcConfigurers(configurers);
+        // 一个参考实现：将所有的WebMvcConfigurer相关的配置都来一起调用；
+        @Override
+        //public void addViewControllers(ViewControllerRegistry registry) {
+        //    for (WebMvcConfigurer delegate : this.delegates) {
+        //    	delegate.addViewControllers(registry);
+        //    }
+        //}
+    }
+}
+```
+
+​		3）、容器中所有的WebMvcConfigurer都会一起起作用；
+
+​		4）、我们的配置类也会被调用；
+
+​		效果：SpringMVC的自动配置和我们的扩展配置都会起作用；
+
+#### 3、全面接管SpringMVC
+
+SpringBoot对SpringMVC的自动配置不需要了，所有都是我们自己配；
+
+我们需要在配置类中添加@EnableWebMvc即可
+
+### 5、如何修改SpringBoot的默认配置
+
+模式：
+
+​		1）、SpringBoot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有才自动配置；如果有些组件可以有多个（ViewResolver）将用户配置的和自己默认的组合起来；
+
+​		2）、

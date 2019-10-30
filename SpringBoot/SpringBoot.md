@@ -1590,9 +1590,59 @@ public void setConfigurers(List<WebMvcConfigurer> configurers) {
 
 #### 3、全面接管SpringMVC
 
-SpringBoot对SpringMVC的自动配置不需要了，所有都是我们自己配；
+SpringBoot对SpringMVC的自动配置不需要了，所有都是我们自己配；所有的SpringMVC的自动配置都失效了
 
-我们需要在配置类中添加@EnableWebMvc即可
+**我们需要在配置类中添加@EnableWebMvc即可；**
+
+```java
+//使用WebMvcConfigurerAdapter可以用来扩展SpringMVC的功能
+@EnableWebMvc
+@Configuration
+public class MyMvcConfig extends WebMvcConfigurerAdapter{
+    
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry){
+        //super.addViewControllers(registry);
+        //浏览器发送/jyj请求来到success
+        registry.addViewController("/jyj").setViewName("success");
+    }
+}
+```
+
+原理：
+
+​	为什么@EnableWebMvc自动配置就失效了；
+
+1）@EnableWebMvc的核心
+
+```java
+@Import(DelegatingWebMvcConfiguration.class)
+public @interface EnableWebMvc{}
+```
+
+2）
+
+```java
+@Configuration
+public class DelegatingWebMvcConfiguration extends WebMvcConfigurationSupport{}
+```
+
+3)
+
+```java
+@Configuration
+@ConditionalOnWebApplication
+@ConditionalOnClass({ Servlet.class,DispatcherServlet.class,WebMvcConfigurerAdapter.class })
+// 容器中没有这个组件的时候，这个自动配置类才生效
+@ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
+@AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
+@AutoConfigureAfter({DispatcherServletAutoConfiguration.class,ValidationAutoConfiguration.class })
+public class WebMvcAutoConfiguration {}
+```
+
+4）@EnableWebMvc将WebMvcConfigurationSupport组件导入进来；
+
+5）导入的WebMvcConfigurationSupport只是SpringMVC最基本的功能；
 
 ### 5、如何修改SpringBoot的默认配置
 
@@ -1600,4 +1650,5 @@ SpringBoot对SpringMVC的自动配置不需要了，所有都是我们自己配�
 
 ​		1）、SpringBoot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有才自动配置；如果有些组件可以有多个（ViewResolver）将用户配置的和自己默认的组合起来；
 
-​		2）、
+​		2）、在SpringBoot中会有非常多的xxxConfigurer帮助我们进行扩展配置；
+

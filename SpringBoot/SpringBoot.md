@@ -1652,3 +1652,219 @@ public class WebMvcAutoConfiguration {}
 
 ​		2）、在SpringBoot中会有非常多的xxxConfigurer帮助我们进行扩展配置；
 
+### 6、RestfulCRUD
+
+#### 1、国际化
+
+**1）、编写国际化配置文件；**
+
+2）、使用ResourceBundleMessageSource管理国际化资源文件；
+
+3）、在页面使用fmt:message取出国际化内容；
+
+
+
+步骤：
+
+1）、编写国际化配置文件，抽取页面需要显示的国际化消息
+
+![internationalization](F:\markdown\SpringBoot\images\internationalization.png)
+
+2）、SpringBoot自动配置好了管理国际化资源文件的组件；
+
+```java
+@ConfigurationProperties(prefix = "spring.messages")
+public class MessageSourceAutoConfiguration {
+    
+    /**
+	 * Comma-separated list of basenames (essentially a fully-qualified classpath
+	 * location), each following the ResourceBundle convention with relaxed support for
+	 * slash based locations. If it doesn't contain a package qualifier (such as
+	 * "org.mypackage"), it will be resolved from the classpath root.
+	 */
+	private String basename = "messages"; 
+    //我们的配置文件可以直接放在类路径下叫message.properties；
+    
+    @Bean
+	public MessageSource messageSource() {
+		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		if (StringUtils.hasText(this.basename)) {
+            //设置国际化资源文件的基础名（去掉语言国家代码的）
+			messageSource.setBasenames(StringUtils.commaDelimitedListToStringArray(
+					StringUtils.trimAllWhitespace(this.basename)));
+		}
+		if (this.encoding != null) {
+			messageSource.setDefaultEncoding(this.encoding.name());
+		}
+		messageSource.setFallbackToSystemLocale(this.fallbackToSystemLocale);
+		messageSource.setCacheSeconds(this.cacheSeconds);
+		messageSource.setAlwaysUseMessageFormat(this.alwaysUseMessageFormat);
+		return messageSource;
+	}
+}
+```
+
+```properties
+spring.messages.basename=i18n.login
+```
+
+3）、去页面获取国际化的值；
+
+```html
+<h1 class="tip" th:text="#{login.tip}">Please sign in</h1>
+<label class="username" th:text="#{login.username}">Username</label>
+<input type="text" class="form-control" placeholder="Username" th:placeholder="#{login.username}"/>
+<label class="password" th:text="#{login.password}">Password</label>
+<input type="checkbox" value="remember-me"/>[[#{login.remember}]]
+<button class="btn" type="submit" th:text="#{login.btn }">Sign in</button>
+```
+
+效果：根据浏览器语言设置的信息切换国际化
+
+原理：
+
+​	国际化Locale（区域信息对象）；LocaleResolver（获取区域信息对象）；
+
+```java
+@Bean
+@ConditionalOnMissingBean
+@ConditionalOnProperty(prefix = "spring.mvc", name = "locale")
+public LocaleResolver localeResolver() {
+	if (this.mvcProperties.getLocaleResolver() == WebMvcProperties.LocaleResolver.FIXED){
+		return new FixedLocaleResolver(this.mvcProperties.getLocale());
+	}
+	AcceptHeaderLocaleResolver localeResolver = new AcceptHeaderLocaleResolver();
+	localeResolver.setDefaultLocale(this.mvcProperties.getLocale());
+	return localeResolver;
+}
+默认的就是根据请求头带来的区域信息获取Locale进行国际化
+```
+
+4）、点击切换国际化
+
+```html
+<a class="btn" th:href="@{/index.html(l='zh_CN')}"></a>
+<a class="btn" th:href="@{/index.html(l='en_US')}"></a>
+```
+
+```java
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.LocaleResolver;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
+/**
+ * 可以在链接上携带区域信息
+ */
+public class MyLocaleResolver implements LocaleResolver {
+    @Override
+    public Locale resolveLocale(HttpServletRequest request) {
+        String l = request.getParameter("l");
+        Locale locale = Locale.getDefault();
+        if (!StringUtils.isEmpty(l)) {
+            String[] split = l.split("_");
+            locale = new Locale(split[0], split[1]);
+        }
+        return locale;
+    }
+
+    @Override
+    public void setLocale(HttpServletRequest request, HttpServletResponse response, Locale locale) {
+
+    }
+}
+
+========================================================================================
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+// 使用WebMvcConfigurerAdapter可以来扩展SpringMVC的功能
+@Configuration
+public class MyMvcConfig extends WebMvcConfigurerAdapter {
+    @Bean
+    public LocaleResolver localeResolver(){
+        return new MyLocaleResolver();
+    }
+}
+```
+
+#### 2、登录&拦截器
+
+登录错误消息的显示
+
+```html
+<p style="color:red" th:text="${msg}" th:if"${not #strings.isEmpty(msg)}"></p>
+```
+
+1、拦截器进行登录检查
+
+```java
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * 登录检查
+ */
+public class LoginHandlerInterceptor implements HandlerInterceptor {
+    // 目标方法执行之前
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        Object user = request.getSession().getAttribute("loginUser");
+        if (user == null) {
+            // 未登录，返回登录页面
+            request.setAttribute("msg", "没有权限请先登录");
+            request.getRequestDispatcher("/index.html").forward(request, response);
+            return false;
+        } else {
+            // 已登录，放行请求
+            return true;
+        }
+
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+
+    }
+}
+
+=========================================================================================
+
+@Configuration
+public class MyMvcConfig extends WebMvcConfigurerAdapter {
+
+    //所有WebMvcConfigurerAdapter组件都会一起作用
+    @Bean  //将组件注册在容器
+    public WebMvcConfigurerAdapter webMvcConfigurerAdapter() {
+        WebMvcConfigurerAdapter adapter = new WebMvcConfigurerAdapter() {
+            @Override
+            public void addViewControllers(ViewControllerRegistry registry) {
+                registry.addViewController("/").setViewName("login");
+                registry.addViewController("/index.html").setViewName("login");
+                registry.addViewController("/main.html").setViewName("dashboard");
+            }
+
+            //注册拦截器
+            @Override
+            public void addInterceptors(InterceptorRegistry registry) {
+                //super.addInterceptors(registry);
+                //静态资源：*.css,*.js
+                //SpringBoot已经做好了静态资源映射
+                registry.addInterceptor(new LoginHandlerInterceptor()).addPathPatterns("/**")
+                        .excludePathPatterns("/index.html","/","/user/login");
+            }
+        };
+
+        return adapter;
+    }
+}
+```
+

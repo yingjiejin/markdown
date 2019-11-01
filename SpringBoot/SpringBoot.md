@@ -1868,3 +1868,94 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter {
 }
 ```
 
+# 七、启动配置原理
+
+几个重要的事件回调机制
+
+ApplicationContextInitializer
+
+SpringApplicationRunListener
+
+ApplicationRunner
+
+CommandLineRunner
+
+启动流程：
+
+**1、创建SpringApplication对象**
+
+```java
+initialize(sources);
+private void initialize(Object[] sources) {
+    //保存主配置类
+	if (sources != null && sources.length > 0) {
+		this.sources.addAll(Arrays.asList(sources));
+	}
+    //判断当前是否一个web应用
+	this.webEnvironment = deduceWebEnvironment();
+    //从类路径下找到META-INF/spring.factories配置的所有ApplicationContextInitializer；然后保存起来
+	setInitializers((Collection) getSpringFactoriesInstances(
+				ApplicationContextInitializer.class));
+    //从类路径下找到META-INF/spring.factories配置的所有ApplicationListener
+	setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+    //从多个配置类中找到有main方法的主配置类
+	this.mainApplicationClass = deduceMainApplicationClass();
+}
+```
+
+
+
+2、运行run方法
+
+```java
+public ConfigurableApplicationContext run(String... args) {
+	StopWatch stopWatch = new StopWatch();
+	stopWatch.start();
+	ConfigurableApplicationContext context = null;
+	FailureAnalyzers analyzers = null;
+	configureHeadlessProperty();
+    
+    //获取SpringApplicationRunListeners，从类路径下META-INF/spring.factories获取
+	SpringApplicationRunListeners listeners = getRunListeners(args);
+    //回调所有的SpringApplicationRunListeners.starting()方法
+	listeners.starting();
+	try {
+        //封装命令行参数
+		ApplicationArguments applicationArguments = new DefaultApplicationArguments(
+				args);
+        //准备环境
+		ConfigurableEnvironment environment = prepareEnvironment(listeners,
+				applicationArguments);
+        	//创建环境完成后回调SpringApplicationRunListener.environmentPrepared();表示环境准备				完成
+        	
+		Banner printedBanner = printBanner(environment);
+        
+        //创建ApplicationContext;决定创建web的ioc还是普通的ioc
+		context = createApplicationContext();
+        
+		analyzers = new FailureAnalyzers(context);
+        //准备上下文环境；将environment保存到ioc中；而且applyInitializers()；
+        //applyInitializers()；回调之前保存的所有ApplicationContextInitializer的initialize方法
+        //回调所有的SpringApplicationRunListener的contextPrepared
+        //
+		prepareContext(context, environment, listeners, applicationArguments,
+				printedBanner);
+        //prepareContext运行完成以后回调所有的SpringApplicationRunListener的contextLoaded();
+        
+		refreshContext(context);
+		afterRefresh(context, applicationArguments);
+		listeners.finished(context, null);
+		stopWatch.stop();
+		if (this.logStartupInfo) {
+			new StartupInfoLogger(this.mainApplicationClass)
+					.logStarted(getApplicationLog(), stopWatch);
+		}
+		return context;
+	}
+	catch (Throwable ex) {
+		handleRunFailure(context, listeners, analyzers, ex);
+		throw new IllegalStateException(ex);
+	}
+}
+```
+

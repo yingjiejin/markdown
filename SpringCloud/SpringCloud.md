@@ -122,14 +122,6 @@ SpringBoot可以离开SpringCloud独立使用开发项目，==但是SpringCloud�
 
 ==SpringBoot专注于快速、方便的开发单个微服务个体，SpringCloud关注全局的服务治理框架。==
 
-## （二）SpringCloud能干什么
-
-## （三）SpringCloud去哪下载
-
-## （四）SpringCloud怎么玩
-
-## （五）SpringCloud国内使用情况
-
 # 三、Rest微服务构建案例工程模块
 
 

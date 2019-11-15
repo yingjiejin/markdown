@@ -122,15 +122,39 @@ SpringBoot可以离开SpringCloud独立使用开发项目，==但是SpringCloud�
 
 ==SpringBoot专注于快速、方便的开发单个微服务个体，SpringCloud关注全局的服务治理框架。==
 
-# 三、Rest微服务构建案例工程模块
 
 
+# 三、Eureka服务注册与发现
 
-# 四、Eureka服务注册与发现
+## （一）Eureka是什么
 
+Eureka是Netflix的一个子模块，也是核心模块之一。Eureka是一个基于REST服务，用于定位服务，以实现云端中间层服务发现和故障转移。服务注册与发现对于微服务架构来说是非常重要的，有了服务发现与注册，==只需要使用服务的标识符，就可以访问到服务==，而不需要修改服务调用的配置文件了。==功能类似于dubbo的注册中心，比如Zookeeper。==
 
+1. Eureka的基本架构
 
-# 五、Ribbon负载均衡
+   > SpringCloud封装了Netflix公司开发的Eureka模块来实现服务注册和发现
+
+   > Eureka采用了C-S的设计架构。Eureka Server作为服务注册功能的服务器，它是服务注册中心。
+
+   > 而系统中的其他微服务，使用Eureka的客户端连接到Eureka Server并维持心跳连接，这样系统的维护人员就可以通过Eureka Server来监控系统中各个微服务是否正常运行。SpringCloud的一些其他模块（比如Zuul）就可以通过Eureka Server来发现系统中的其他微服务，并执行相关的逻辑。
+
+   ==Eureka包含两个组件：Eureka Server 和 Eureka Client==
+
+   - Eureka Server 提供服务注册服务
+
+     > 各个节点启动后，会在Eureka Server 中进行注册，这样Eureka Server 中的服务注册表中将会存储所有可用服务节点的信息，服务节点的信息可以在界面中直观的看到。
+
+   - Eureka Client是一个java客户端
+
+     >用于简化Eureka Server 的交互，客户端同时也具备一个内置的、使用轮询（round-robin）负载算法的负载均衡器。在应用启动后，将会向Eureka Server发送心跳（默认周期为30秒）。如果Eureka Server在多个心跳周期内没有接收到某个节点的心跳，Eureka Server将会从服务注册表中把这个服务节点移除（默认90秒）
+
+2. 三大角色
+
+   - Eureka Server提供服务注册和发现
+   - Service Provider服务提供方将自身服务注册到Eureka，从而使服务消费方能够找到
+   - Service Consumer服务消费方从Eureka 获取注册服务列表，从而能够消费服务
+
+# 四、Ribbon负载均衡
 
 
 

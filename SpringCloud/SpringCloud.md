@@ -154,6 +154,39 @@ Eureka是Netflix的一个子模块，也是核心模块之一。Eureka是一个�
    - Service Provider服务提供方将自身服务注册到Eureka，从而使服务消费方能够找到
    - Service Consumer服务消费方从Eureka 获取注册服务列表，从而能够消费服务
 
+## （二）服务注册中心建立
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-eureka-server</artifactId>
+</dependency>
+```
+
+```yaml
+eureka:
+	instance:
+		hostname: localhost #eureka服务端的实例名称
+	client:
+		register-with-eureka: false #false表示不向注册中心注册自己
+		fetch-registry: false #false表示自己就是注册中心，职责就是维护服务实例，不需要去检索服务
+		service-url: 
+			defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+			# 设置与Eureka Server交互的地址查询服务和注册服务都需要依赖这个地址
+```
+
+```java
+@SpringBootApplication
+@EnableEurekaServer //EurekaServer服务器端启动类，接收其它微服务注册进来
+public class EurekaServerApp{
+    public static void main(Sring[] args){
+        SpringApplication.run(EurekaServerApp.class,args); 
+    }
+}
+```
+
+
+
 # 四、Ribbon负载均衡
 
 

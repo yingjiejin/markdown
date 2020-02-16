@@ -182,9 +182,9 @@ Redis所有数据保持在内存中，对数据的更新将异步地保存到磁
 
 #### 1.keys
 
-![keys(1)](F:\markdown\redis\images\RedisAPI\keys(1).png)
+![keys(1)](F:\markdown\redis\images\RedisAPI\通用命令\keys(1).png)
 
-![keys(2)](F:\markdown\redis\images\RedisAPI\keys(2).png)
+![keys(2)](F:\markdown\redis\images\RedisAPI\通用命令\keys(2).png)
 
 > ==keys命令一般不在生产环境使用==
 
@@ -195,27 +195,27 @@ Redis所有数据保持在内存中，对数据的更新将异步地保存到磁
 
 #### 2.dbsize
 
-![dbsize](F:\markdown\redis\images\RedisAPI\dbsize.png)
+![dbsize](F:\markdown\redis\images\RedisAPI\通用命令\dbsize.png)
 
 #### 3.exists
 
-![exists](F:\markdown\redis\images\RedisAPI\exists.png)
+![exists](F:\markdown\redis\images\RedisAPI\通用命令\exists.png)
 
 #### 4.del
 
-![del](F:\markdown\redis\images\RedisAPI\del.png)
+![del](F:\markdown\redis\images\RedisAPI\通用命令\del.png)
 
 #### 5.expire、ttl、persist
 
-![expire(1)](F:\markdown\redis\images\RedisAPI\expire(1).png)
+![expire(1)](F:\markdown\redis\images\RedisAPI\通用命令\expire(1).png)
 
-![expire(2)](F:\markdown\redis\images\RedisAPI\expire(2).png)
+![expire(2)](F:\markdown\redis\images\RedisAPI\通用命令\expire(2).png)
 
-![expire(3)](F:\markdown\redis\images\RedisAPI\expire(3).png)
+![expire(3)](F:\markdown\redis\images\RedisAPI\通用命令\expire(3).png)
 
 #### 6.type
 
-![type](F:\markdown\redis\images\RedisAPI\type.png)
+![type](F:\markdown\redis\images\RedisAPI\通用命令\type.png)
 
 #### 7.时间复杂度
 
@@ -252,7 +252,7 @@ Redis所有数据保持在内存中，对数据的更新将异步地保存到磁
 
 ### 1.字符串键值结构
 
-![字符串键值结构](F:\markdown\redis\images\RedisAPI\字符串键值结构.png)
+![字符串键值结构](F:\markdown\redis\images\RedisAPI\String\字符串键值结构.png)
 
 ### 2.使用场景
 
@@ -262,15 +262,15 @@ Redis所有数据保持在内存中，对数据的更新将异步地保存到磁
 
 ### 3.get、set、del
 
-![get、set、del-1](F:\markdown\redis\images\RedisAPI\get、set、del-1.png)
+![get、set、del-1](F:\markdown\redis\images\RedisAPI\String\get、set、del-1.png)
 
-![get、set、del-2](F:\markdown\redis\images\RedisAPI\get、set、del-2.png)
+![get、set、del-2](F:\markdown\redis\images\RedisAPI\String\get、set、del-2.png)
 
 ### 4.incr、decr、incrby、decrby
 
-![incr、decr、incrby、decrby-1](F:\markdown\redis\images\RedisAPI\incr、decr、incrby、decrby-1.png)
+![incr、decr、incrby、decrby-1](F:\markdown\redis\images\RedisAPI\String\incr、decr、incrby、decrby-1.png)
 
-![incr、decr、incrby、decrby-2](F:\markdown\redis\images\RedisAPI\incr、decr、incrby、decrby-2.png)
+![incr、decr、incrby、decrby-2](F:\markdown\redis\images\RedisAPI\String\incr、decr、incrby、decrby-2.png)
 
 ### 5.实战
 
@@ -293,37 +293,37 @@ public VideoInfo get(long id){
 
 #### （2）分布式id生成器
 
-![redis分布式id生成器](F:\markdown\redis\images\RedisAPI\redis分布式id生成器.png)
+![redis分布式id生成器](F:\markdown\redis\images\RedisAPI\String\redis分布式id生成器.png)
 
 ### 6. set、setnx、setxx
 
-![set、setnx、setxx-1](F:\markdown\redis\images\RedisAPI\set、setnx、setxx-1.png)
+![set、setnx、setxx-1](F:\markdown\redis\images\RedisAPI\String\set、setnx、setxx-1.png)
 
-![set、setnx、setxx-2](F:\markdown\redis\images\RedisAPI\set、setnx、setxx-2.png)
+![set、setnx、setxx-2](F:\markdown\redis\images\RedisAPI\String\set、setnx、setxx-2.png)
 
 ### 7.mget、mset
 
-![mget、mset-1](F:\markdown\redis\images\RedisAPI\mget、mset-1.png)
+![mget、mset-1](F:\markdown\redis\images\RedisAPI\String\mget、mset-1.png)
 
-![mget、mset-2](F:\markdown\redis\images\RedisAPI\mget、mset-2.png)
+![mget、mset-2](F:\markdown\redis\images\RedisAPI\String\mget、mset-2.png)
 
 ### 8.n次get 和 1次mget
 
-![n次get](F:\markdown\redis\images\RedisAPI\n次get.png)
+![n次get](F:\markdown\redis\images\RedisAPI\String\n次get.png)
 
-![1次mget](F:\markdown\redis\images\RedisAPI\1次mget.png)
+![1次mget](F:\markdown\redis\images\RedisAPI\String\1次mget.png)
 
 ### 9.getset、append、strlen
 
-![getset、append、strlen-1](F:\markdown\redis\images\RedisAPI\getset、append、strlen-1.png)
+![getset、append、strlen-1](F:\markdown\redis\images\RedisAPI\String\getset、append、strlen-1.png)
 
-![getset、append、strlen-2](F:\markdown\redis\images\RedisAPI\getset、append、strlen-2.png)
+![getset、append、strlen-2](F:\markdown\redis\images\RedisAPI\String\getset、append、strlen-2.png)
 
 ### 10.incrbyfloat、getrange、setrange
 
-![incrbyfloat、getrange、setrange-1](F:\markdown\redis\images\RedisAPI\incrbyfloat、getrange、setrange-1.png)
+![incrbyfloat、getrange、setrange-1](F:\markdown\redis\images\RedisAPI\String\incrbyfloat、getrange、setrange-1.png)
 
- ![incrbyfloat、getrange、setrange-2](F:\markdown\redis\images\RedisAPI\incrbyfloat、getrange、setrange-2.png)
+ ![incrbyfloat、getrange、setrange-2](F:\markdown\redis\images\RedisAPI\String\incrbyfloat、getrange、setrange-2.png)
 
 ### 11.字符串总结
 
@@ -340,25 +340,25 @@ public VideoInfo get(long id){
 
 ### 1.哈希键值结构
 
-![哈希键值结构](F:\markdown\redis\images\RedisAPI\哈希键值结构.png)
+![哈希键值结构](F:\markdown\redis\images\RedisAPI\hash\哈希键值结构.png)
 
  ### 2.hget、hset、hdel
 
-![hget、hset、hdel-1](F:\markdown\redis\images\RedisAPI\hget、hset、hdel-1.png)
+![hget、hset、hdel-1](F:\markdown\redis\images\RedisAPI\hash\hget、hset、hdel-1.png)
 
-![hget、hset、hdel-2](F:\markdown\redis\images\RedisAPI\hget、hset、hdel-2.png)
+![hget、hset、hdel-2](F:\markdown\redis\images\RedisAPI\hash\hget、hset、hdel-2.png)
 
 ### 3.hexists、hlen
 
-![hexists、hlen-1](F:\markdown\redis\images\RedisAPI\hexists、hlen-1.png)
+![hexists、hlen-1](F:\markdown\redis\images\RedisAPI\hash\hexists、hlen-1.png)
 
-![hexists、hlen-2](F:\markdown\redis\images\RedisAPI\hexists、hlen-2.png)
+![hexists、hlen-2](F:\markdown\redis\images\RedisAPI\hash\hexists、hlen-2.png)
 
 ### 4.hmget、hmset
 
-![hmget、hmset-1](F:\markdown\redis\images\RedisAPI\hmget、hmset-1.png)
+![hmget、hmset-1](F:\markdown\redis\images\RedisAPI\hash\hmget、hmset-1.png)
 
-![hmget、hmset-2](F:\markdown\redis\images\RedisAPI\hmget、hmset-2.png)
+![hmget、hmset-2](F:\markdown\redis\images\RedisAPI\hash\hmget、hmset-2.png)
 
 ### 5.实战
 
@@ -387,6 +387,185 @@ public VideoInfo get(long id){
 
 ### 6.hgetAll、hvals、hkeys
 
-![hgetAll、hvals、hkeys-1](F:\markdown\redis\images\RedisAPI\hgetAll、hvals、hkeys-1.png)
+![hgetAll、hvals、hkeys-1](F:\markdown\redis\images\RedisAPI\hash\hgetAll、hvals、hkeys-1.png)
 
-![hgetAll、hvals、hkeys-2](F:\markdown\redis\images\RedisAPI\hgetAll、hvals、hkeys-2.png)
+![hgetAll、hvals、hkeys-2](F:\markdown\redis\images\RedisAPI\hash\hgetAll、hvals、hkeys-2.png)
+
+## （六）list
+
+ ### 1.列表结构(有序，可重复，两边插入弹出)
+
+![列表结构1](F:\markdown\redis\images\RedisAPI\list\列表结构1.png)
+
+## 
+
+![列表结构2](F:\markdown\redis\images\RedisAPI\list\列表结构2.png)
+
+### 2.rpush
+
+![rpush](F:\markdown\redis\images\RedisAPI\list\rpush.png)
+
+### 3.lpush
+
+![lpush](F:\markdown\redis\images\RedisAPI\list\lpush.png)
+
+### 4.linsert
+
+![linsert](F:\markdown\redis\images\RedisAPI\list\linsert.png)
+
+### 5.lpop
+
+![lpop](F:\markdown\redis\images\RedisAPI\list\lpop.png)
+
+### 6.rpop
+
+![rpop](F:\markdown\redis\images\RedisAPI\list\rpop.png)
+
+### 7.lrem
+
+![lrem](F:\markdown\redis\images\RedisAPI\list\lrem.png)
+
+### 8.ltrim
+
+![ltrim](F:\markdown\redis\images\RedisAPI\list\ltrim.png)
+
+### 9.lrange
+
+![lrange1](F:\markdown\redis\images\RedisAPI\list\lrange1.png)
+
+![lrange2](F:\markdown\redis\images\RedisAPI\list\lrange2.png)
+
+### 10.lindex
+
+![lindex](F:\markdown\redis\images\RedisAPI\list\lindex.png)
+
+### 11.llen
+
+![llen](F:\markdown\redis\images\RedisAPI\list\llen.png)
+
+### 12.lset
+
+![lset](F:\markdown\redis\images\RedisAPI\list\lset.png)
+
+### 13.操作
+
+![操作](F:\markdown\redis\images\RedisAPI\list\操作.png)
+
+### 14.blpop、brpop
+
+![blpop、brpop](F:\markdown\redis\images\RedisAPI\list\blpop、brpop.png)
+
+### 15.TIPS
+
+1. LPUSH + LPOP =Stack
+2. LPUSH + RPOP = Quene
+3. LPUSH + LTRIM = Capped Collection
+4. LPUSH + BRPOP = Message Queue
+
+## （七）set（无序、无重复、集合间操作）
+
+### 1.集合结构
+
+![集合结构](F:\markdown\redis\images\RedisAPI\set\集合结构-1.png)
+
+![集合结构-2](F:\markdown\redis\images\RedisAPI\set\集合结构-2.png)
+
+### 2.sadd、srem
+
+![sadd、srem](F:\markdown\redis\images\RedisAPI\set\sadd、srem.png)
+
+### 3.scard、sismember、srandmember、smember
+
+![scard、sismember、srandmemeber、smemeber](F:\markdown\redis\images\RedisAPI\set\scard、sismember、srandmemeber、smemeber.png)
+
+> smember：无序、小心使用（全部取出）
+>
+> srandmember和spop
+>
+> > 1. spop从集合弹出
+> > 2. srandmember不会破坏集合
+
+### 4.实战
+
+![实战1](F:\markdown\redis\images\RedisAPI\set\实战1.png)
+
+### 5.sdiff、sinter、sunion（集合间API）
+
+![sdiff、sinter、sunion](F:\markdown\redis\images\RedisAPI\set\sdiff、sinter、sunion.png)
+
+### 6.TIPS
+
+SADD = Tagging
+
+SPOP/SRANDMEMBER = Random item
+
+SADD + SINTER = Social Graph
+
+## （八）zset
+
+### 1.有序集合结构
+
+![有序集合结构](F:\markdown\redis\images\RedisAPI\zset\有序集合结构.png)
+
+### 2.集合VS有序集合
+
+![集合VS有序集合-1](F:\markdown\redis\images\RedisAPI\zset\集合VS有序集合-1.png)
+
+### 3.列表VS有序集合
+
+![列表VS有序集合](F:\markdown\redis\images\RedisAPI\zset\列表VS有序集合.png)
+
+### 4.zadd
+
+![zadd](F:\markdown\redis\images\RedisAPI\zset\zadd.png)
+
+### 5.zrem
+
+![zrem](F:\markdown\redis\images\RedisAPI\zset\zrem.png)
+
+### 6.zscore
+
+![zscore](F:\markdown\redis\images\RedisAPI\zset\zscore.png)
+
+### 7.zincrby
+
+![zincrby](F:\markdown\redis\images\RedisAPI\zset\zincrby.png)
+
+### 8.zcard
+
+![zcard](F:\markdown\redis\images\RedisAPI\zset\zcard.png)
+
+![实战演示](F:\markdown\redis\images\RedisAPI\zset\实战演示.png)
+
+### 9.zrange
+
+![zrange](F:\markdown\redis\images\RedisAPI\zset\zrange.png)
+
+### 10.zrangebyscore
+
+![zrangebyscore](F:\markdown\redis\images\RedisAPI\zset\zrangebyscore.png)
+
+### 11.zcount
+
+![zcount](F:\markdown\redis\images\RedisAPI\zset\zcount.png)
+
+### 12.zremrangebyrank
+
+![zremrangebyrank](F:\markdown\redis\images\RedisAPI\zset\zremrangebyrank.png)
+
+### 13.zremrangebyscore
+
+![zremrangebyscore](F:\markdown\redis\images\RedisAPI\zset\zremrangebyscore.png)
+
+![实战演示-2](F:\markdown\redis\images\RedisAPI\zset\实战演示-2.png)
+
+### 14.查缺补漏
+
+| 命令             | 说明               |
+| ---------------- | ------------------ |
+| zrevrank         | 按照从高到低排名   |
+| zrevrange        | 从高到低取值       |
+| zrevrangebyscore | 分数从高到低的结果 |
+| zinterstore      | 对两个集合进行交集 |
+| zunionstore      | 对两个集合进行并集 |
+

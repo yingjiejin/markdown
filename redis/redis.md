@@ -182,7 +182,25 @@ Redis所有数据保持在内存中，对数据的更新将异步地保存到磁
 
 #### 1.keys
 
-![keys(1)](F:\markdown\redis\images\RedisAPI\通用命令\keys(1).png)
+```shell
+keys *
+# 遍历所有key
+```
+
+```shell
+127.0.0.1:6379> set hello world
+OK
+127.0.0.1:6379> set php good
+OK
+127.0.0.1:6379> set java best
+OK
+127.0.0.1:6379> keys *
+1) "java"
+2) "php"
+3) "hello"
+127.0.0.1:6379> dbsize
+(integer) 3
+```
 
 ![keys(2)](F:\markdown\redis\images\RedisAPI\通用命令\keys(2).png)
 
@@ -209,9 +227,35 @@ Redis所有数据保持在内存中，对数据的更新将异步地保存到磁
 
 ![expire(1)](F:\markdown\redis\images\RedisAPI\通用命令\expire(1).png)
 
-![expire(2)](F:\markdown\redis\images\RedisAPI\通用命令\expire(2).png)
-
-![expire(3)](F:\markdown\redis\images\RedisAPI\通用命令\expire(3).png)
+```shell
+127.0.0.1:6379> set hello world
+OK
+127.0.0.1:6379> expire hello 20
+(integer) 1
+127.0.0.1:6379> ttl hello
+(integer) 16
+127.0.0.1:6379> get hello
+"world"
+127.0.0.1:6379> ttl hello
+(integer) 7
+127.0.0.1:6379> ttl hello
+(integer) -2 (-2代表key已经不存在了)
+127.0.0.1:6379> get hello
+(nil)
+=========================================================================================
+127.0.0.1:6379> set hello world
+OK
+127.0.0.1:6379> expire hello 20
+(integer) 1
+127.0.0.1:6379> ttl hello
+(integer) 16 (还有16秒过期)
+127.0.0.1:6379> persist hello
+(integer) 1
+127.0.0.1:6379> ttl hello
+(integer) -1 (-1代表key存在，并且没有过期时间。)
+127.0.0.1:6379> get hello
+"world"
+```
 
 #### 6.type
 
@@ -557,7 +601,30 @@ SADD + SINTER = Social Graph
 
 ![zremrangebyscore](F:\markdown\redis\images\RedisAPI\zset\zremrangebyscore.png)
 
-![实战演示-2](F:\markdown\redis\images\RedisAPI\zset\实战演示-2.png)
+```shell
+127.0.0.1:6379> zadd player:rank 1000 ronaldo 900 messi 800 c-ronaldo 600 kaka
+(integer) 4
+127.0.0.1:6379> zrange player:rank 0 -1
+1) "kaka"
+2) "c-ronaldo"
+3) "messi"
+4) "ronaldo"
+127.0.0.1:6379> zcount player:rank 700 901
+(integer) 2
+127.0.0.1:6379> zrangebyscore player:rank 700 901
+1) "c-ronaldo"
+2) "messi"
+127.0.0.1:6379> zremrangeburank player:rank 0 1
+(integer) 2
+127.0.0.1:6379> zrange player:rank 0 -1
+1) "messi"
+2) "ronaldo"
+127.0.0.1:6379> zrange player:rank 0 -1 withscores
+1) "messi"
+2) "900"
+3) "ronaldo"
+4) "1000"
+```
 
 ### 14.查缺补漏
 
@@ -568,4 +635,49 @@ SADD + SINTER = Social Graph
 | zrevrangebyscore | 分数从高到低的结果 |
 | zinterstore      | 对两个集合进行交集 |
 | zunionstore      | 对两个集合进行并集 |
+
+# 三、Redis客户端
+
+## （一）Jedis (Java客户端)
+
+### 1. Jedis获取
+
+```xml
+<dependency>
+    <groupId>redis.clients</groupId>
+    <artifactId>jedis</artifactId>
+    <version>2.9.0</version>
+    <type>jar</type>
+    <scope>compile</scope>
+</dependency>
+```
+
+### 2. Jedis直连
+
+```java
+// 1.生成一个Jedis对象，这个对象负责和指定Redis节点进行通讯
+Jedis jedis = new Jedis("127.0.0.1",6379);
+// 2.jedis执行set操作
+jedis.set("hello","world");
+// 3.jedis执行get操作，value=“world”
+String value = jedis.get("hello");
+
+Jedis(String host,int port,int connectionTimeout,int soTimeout)
+- host：Redis节点的所在机器的IP
+- port：Redis节点的端口
+- connectionTimeout：客户端连接超时
+- soTimeout：客户端读写超时    
+```
+
+### 3.简单使用
+
+```java
+// 1.String
+// 输出结果：OK
+jedis.set("hello","world");
+// 输出结果：world
+jedis.get("hello");
+// 输出结果：1
+jedis.incr("counter");
+```
 

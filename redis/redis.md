@@ -202,7 +202,24 @@ OK
 (integer) 3
 ```
 
-![keys(2)](F:\markdown\redis\images\RedisAPI\通用命令\keys(2).png)
+```shell
+keys [pattern]
+# 遍历所有key
+```
+
+```shell
+127.0.0.1:6379> mset hello world hehe haha php good phe his
+OK
+127.0.0.1:6379> keys he*
+1) "hehe"
+2) "hello"
+127.0.0.1:6379> keys he[h-l]*
+1) "hehe"
+2) "hello"
+127.0.0.1:6379> keys ph?
+1) "phe"
+2) "php"
+```
 
 > ==keys命令一般不在生产环境使用==
 
@@ -213,19 +230,70 @@ OK
 
 #### 2.dbsize
 
-![dbsize](F:\markdown\redis\images\RedisAPI\通用命令\dbsize.png)
+```shell
+dbsize
+# 计算key的总数
+```
+
+```shell
+127.0.0.1:6379> mset k1 v1 k2 v2 k3 v3 k4 v4
+OK
+127.0.0.1:6379> dbsize
+(integer) 4
+127.0.0.1:6379> sadd myset a b c d e
+(integer) 5
+127.0.0.1:6379> dbsize
+(integer) 5
+```
 
 #### 3.exists
 
-![exists](F:\markdown\redis\images\RedisAPI\通用命令\exists.png)
+```shell
+exists key
+# 检查key是否存在
+```
+
+```shell
+127.0.0.1:6379> set a b
+OK
+127.0.0.1:6379> exists a
+(integer) 1
+127.0.0.1:6379> del a
+(integer) 1
+127.0.0.1:6379> exists a
+(integer) 0
+```
 
 #### 4.del
 
-![del](F:\markdown\redis\images\RedisAPI\通用命令\del.png)
+```shell
+del key
+# 删除指定key-value
+```
+
+```shell
+127.0.0.1:6379> set a b
+OK
+127.0.0.1:6379> get a
+"b"
+127.0.0.1:6379> del a
+(integer) 1
+127.0.0.1:6379> get a
+(nil)
+```
 
 #### 5.expire、ttl、persist
 
-![expire(1)](F:\markdown\redis\images\RedisAPI\通用命令\expire(1).png)
+```shell
+expire key seconds
+# key在seconds秒后过期
+=========================================================================================
+ttl key
+# 查看可以剩余的过期时间
+=========================================================================================
+persist key
+# 去掉key的过期时间
+```
 
 ```shell
 127.0.0.1:6379> set hello world
@@ -259,7 +327,22 @@ OK
 
 #### 6.type
 
-![type](F:\markdown\redis\images\RedisAPI\通用命令\type.png)
+```shell
+type key
+# 返回key的类型
+- String hash list set zset none
+```
+
+```shell
+127.0.0.1:6379> set a b
+OK
+127.0.0.1:6379> type a
+string
+127.0.0.1:6379> sadd myset 1 2 3
+(integer) 3
+127.0.0.1:6379> type myset
+set
+```
 
 #### 7.时间复杂度
 

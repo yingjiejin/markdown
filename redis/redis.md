@@ -389,15 +389,58 @@ set
 
 ### 3.get、set、del
 
-![get、set、del-1](F:\markdown\redis\images\RedisAPI\String\get、set、del-1.png)
+```shell
+get key
+# 获取key对应的value
+===============================
+set key value
+# 设置key-value
+===============================
+del key
+# 删除key-value
+```
 
-![get、set、del-2](F:\markdown\redis\images\RedisAPI\String\get、set、del-2.png)
+```shell
+127.0.0.1:6379> set hello "world"
+OK
+127.0.0.1:6379> get hello
+"world"
+127.0.0.1:6379> del hello
+(integer) 1
+127.0.0.1:6379> get hello
+nil
+```
 
 ### 4.incr、decr、incrby、decrby
 
-![incr、decr、incrby、decrby-1](F:\markdown\redis\images\RedisAPI\String\incr、decr、incrby、decrby-1.png)
+```shell
+incr key       时间复杂度 o(1)
+# key自增1，如果key不存在，自增后get(key)=1    
+=====================================================
+decr key       时间复杂度 o(1)
+# key自减1，如果可以不存在，自减后get(key)=-1
+=====================================================
+incrby key k     时间复杂度o(1)
+# key自增k，如果key不存在，自增后get(key)=k
+=====================================================
+decr key k       时间复杂度o(1)
+# key自减k，如果key不存在，自减后get(key)=-k
+```
 
-![incr、decr、incrby、decrby-2](F:\markdown\redis\images\RedisAPI\String\incr、decr、incrby、decrby-2.png)
+```shell
+127.0.0.1:6379> get counter
+(nil)
+127.0.0.1:6379> incr counter
+(integer) 1
+127.0.0.1:6379> get counter
+"1"
+127.0.0.1:6379> incrby counter 99
+(integer) 100
+127.0.0.1:6379> decr counter
+(integer) 99
+127.0.0.1:6379> get counter
+"99"
+```
 
 ### 5.实战
 
@@ -424,15 +467,60 @@ public VideoInfo get(long id){
 
 ### 6. set、setnx、setxx
 
-![set、setnx、setxx-1](F:\markdown\redis\images\RedisAPI\String\set、setnx、setxx-1.png)
+```shell
+set key value 		时间复杂度 o(1)
+# 不管key是否存在，都设置
+======================================
+setnx key value		时间复杂度 o(1)
+# key不存在，才设置
+======================================
+set key value xx	时间复杂度 o(1)
+# key存在，才设置
+```
 
-![set、setnx、setxx-2](F:\markdown\redis\images\RedisAPI\String\set、setnx、setxx-2.png)
+```shell
+127.0.0.1:6379>  exists php
+(integer) 0
+127.0.0.1:6379>  set php good
+OK
+127.0.0.1:6379> setnx php bad
+(integer) 0
+127.0.0.1:6379> set php best xx
+OK
+127.0.0.1:6379> get php
+"best"
+127.0.0.1:6379> exists java
+(integer) 0
+127.0.0.1:6379> setnx java best
+(integer) 1
+127.0.0.1:6379> set java easy xx
+OK
+127.0.0.1:6379> get java
+"easy"
+127.0.0.1:6379>  exists lua
+(integer) 0
+127.0.0.1:6379> set lua hehe xx
+(nil)
+```
 
 ### 7.mget、mset
 
-![mget、mset-1](F:\markdown\redis\images\RedisAPI\String\mget、mset-1.png)
+```shell
+mget key1 key2 key3...		时间复杂度o(n)
+# 批量获取key，原子操作
+===========================================
+mset key1 value1 key2 value2 key3 value3		时间复杂度o(n)
+# 批量设置key-value
+```
 
-![mget、mset-2](F:\markdown\redis\images\RedisAPI\String\mget、mset-2.png)
+```shell
+127.0.0.1:6379> mset hello world java best php good
+OK
+127.0.0.1:6379> mget hello java php
+1) "world"
+2) "best"
+3) "good"
+```
 
 ### 8.n次get 和 1次mget
 
@@ -442,15 +530,63 @@ public VideoInfo get(long id){
 
 ### 9.getset、append、strlen
 
-![getset、append、strlen-1](F:\markdown\redis\images\RedisAPI\String\getset、append、strlen-1.png)
+```shell
+getset key newvalue			时间复杂度o(1)
+# set key newvalue并返回旧的value
+=================================================
+append key value		时间复杂度o(1)
+# 将value追加到旧的value
+=================================================
+strlen key		时间复杂度o(1)
+# 返回字符串的长度(注意中文)
+```
 
-![getset、append、strlen-2](F:\markdown\redis\images\RedisAPI\String\getset、append、strlen-2.png)
+```shell
+127.0.0.1:6379> set hello world
+OK
+127.0.0.1:6379> getset hello php
+"world"
+127.0.0.1:6379> append hello ",java"
+(integer) 8
+127.0.0.1:6379> get hello
+"php,java"
+127.0.0.1:6379> strlen hello
+(integer) 8
+127.0.0.1:6379> set hello "足球"
+OK
+127.0.0.1:6379> strlen hello
+(integer) 4
+```
 
 ### 10.incrbyfloat、getrange、setrange
 
-![incrbyfloat、getrange、setrange-1](F:\markdown\redis\images\RedisAPI\String\incrbyfloat、getrange、setrange-1.png)
+```shell
+incrbyfloat key 3.5		o(1)
+# 增加key对应的值3.5
+==========================================
+getrange key start end		o(1)
+# 获取字符串指定下标所有的值
+==========================================
+setrange key index value		o(1)
+# 设置指定下标所有对应的值
+```
 
- ![incrbyfloat、getrange、setrange-2](F:\markdown\redis\images\RedisAPI\String\incrbyfloat、getrange、setrange-2.png)
+```shell
+127.0.0.1:6379> incr counter
+(integer) 1
+127.0.0.1:6379> incrbyfloat counter 1.1
+"2.1"
+127.0.0.1:6379> get counter
+"2.1"
+127.0.0.1:6379> set hello javabest
+OK
+127.0.0.1:6379> getrange hello 0 2
+"jav"
+127.0.0.1:6379> setrange hello 4 p
+(integer) 8
+127.0.0.1:6379> get hello
+"javapest"
+```
 
 ### 11.字符串总结
 

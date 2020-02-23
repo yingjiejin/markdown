@@ -607,21 +607,77 @@ OK
 
  ### 2.hget、hset、hdel
 
-![hget、hset、hdel-1](F:\markdown\redis\images\RedisAPI\hash\hget、hset、hdel-1.png)
+```shell
+hget key field		时间复杂度o(1)
+# 获取hash key对应的field的value
+==========================================
+hset key field value		时间复杂度o(1)
+# 设置hash key对应field的value
+==========================================
+hdel key field		时间复杂度o(1)
+# 删除hash key对应field的value
+```
 
-![hget、hset、hdel-2](F:\markdown\redis\images\RedisAPI\hash\hget、hset、hdel-2.png)
+```shell
+127.0.0.1:6379> hset user:1:info age 23
+(integer) 1
+127.0.0.1:6379> hget user:1:info age
+"23"
+127.0.0.1:6379> hset user:1:info name ronaldo
+(integer) 1
+127.0.0.1:6379> hgetall user:1:info
+1) "age"
+2) "23"
+3) "name"
+4) "ronaldo"
+127.0.0.1:6379> hdel user:1:info age
+(integer) 1
+127.0.0.1:6379> hgetall user:1:info 
+1) "name"
+2) "ronaldo"
+```
 
 ### 3.hexists、hlen
 
-![hexists、hlen-1](F:\markdown\redis\images\RedisAPI\hash\hexists、hlen-1.png)
+```shell
+hexists key field		时间复杂度o(1)
+# 判断hash 可以是否有field
+========================================
+hlen key		时间复杂度o(1)
+# 获取hash key field的数量
+```
 
-![hexists、hlen-2](F:\markdown\redis\images\RedisAPI\hash\hexists、hlen-2.png)
+```shell
+127.0.0.1:6379> hgetall user:1:info
+1) "name"
+2) "ronaldo"
+3) "age"
+4) "23"
+127.0.0.1:6379> hexists user:1:info name
+(integer) 1
+127.0.0.1:6379> hlen user:1:info
+(integer) 2
+```
 
 ### 4.hmget、hmset
 
-![hmget、hmset-1](F:\markdown\redis\images\RedisAPI\hash\hmget、hmset-1.png)
+```shell
+hmget key field1 field2... fieldN		时间复杂度o(n)
+# 批量获取hash key的一批field对应的值
+===========================================================================
+hmset key field1 value1 field2 value2...fieldN valueN		时间复杂度o(n)
+# 批量设置hash key的一批field value
+```
 
-![hmget、hmset-2](F:\markdown\redis\images\RedisAPI\hash\hmget、hmset-2.png)
+```shell
+127.0.0.1:6379> hmset user:2:info age 30 name kaka page 50
+OK
+127.0.0.1:6379>  hlen user:2:info
+(integer) 3
+127.0.0.1:6379> hmget user:2:info age name	
+1) "30"
+2) "kaka"
+```
 
 ### 5.实战
 
@@ -650,9 +706,34 @@ public VideoInfo get(long id){
 
 ### 6.hgetAll、hvals、hkeys
 
-![hgetAll、hvals、hkeys-1](F:\markdown\redis\images\RedisAPI\hash\hgetAll、hvals、hkeys-1.png)
+```shell
+hgetall key		时间复杂度o(n)
+# 返回hash key对应所有的field和value
+========================================
+hvals key		时间复杂度o(n)
+# 返回hash key对应所有field的value
+========================================
+hkeys key		时间复杂度o(n)
+# 返回hash key对应所有field
+```
 
-![hgetAll、hvals、hkeys-2](F:\markdown\redis\images\RedisAPI\hash\hgetAll、hvals、hkeys-2.png)
+```shell
+127.0.0.1:6379> hgetall user:2:info
+1) "age"
+2) "30"
+3) "mame"
+4) "kaka"
+5) "page"
+6) "50"
+127.0.0.1:6379> hvals user:2:info
+1) "30"
+2) "kaka"
+3) "50"
+127.0.0.1:6379> hkeys user:2:info
+1) "age"
+2) "name"
+3) "page"
+```
 
 ## （六）list
 
@@ -712,11 +793,37 @@ public VideoInfo get(long id){
 
 ### 13.操作
 
-![操作](F:\markdown\redis\images\RedisAPI\list\操作.png)
+```shell
+127.0.0.1:6379> rpush mylist a b c
+(integer) 3
+127.0.0.1:6379> lrange listkey 0 -1
+1) "a"
+2) "b"
+3) "c"
+127.0.0.1:6379> lpush listkey 0
+(integer) 4
+127.0.0.1:6379> lrange listkey 0 -1
+1) "0"
+2) "a"
+3) "b"
+4) "c"
+127.0.0.1:6379> rpop listkey
+"c"
+127.0.0.1:6379> lrange listkey 0 -1
+1) "0"
+2) "a"
+3) "b"
+```
 
 ### 14.blpop、brpop
 
-![blpop、brpop](F:\markdown\redis\images\RedisAPI\list\blpop、brpop.png)
+```shell
+blpop key timeout		时间复杂度o(1)
+# lpop阻塞版本，timeout是阻塞超时时间，timeout=0为永远不阻塞
+=======================================================
+brpop key timeout		时间复杂度o(1)
+# rpop阻塞版本，timeout是阻塞超时时间，timeout=0为永远不阻塞
+```
 
 ### 15.TIPS
 
@@ -735,7 +842,13 @@ public VideoInfo get(long id){
 
 ### 2.sadd、srem
 
-![sadd、srem](F:\markdown\redis\images\RedisAPI\set\sadd、srem.png)
+```shell
+sadd key element		时间复杂度o(1)
+# 向集合key添加element(如果element已经存在，添加失败)
+===================================================
+srem key element		时间复杂度o(1)
+# 将集合key中的element移除掉
+```
 
 ### 3.scard、sismember、srandmember、smember
 
@@ -750,7 +863,25 @@ public VideoInfo get(long id){
 
 ### 4.实战
 
-![实战1](F:\markdown\redis\images\RedisAPI\set\实战1.png)
+```shell
+127.0.0.1:6379> sadd user:1:follow it news his sports
+(integer) 4
+127.0.0.1:6379> smembers user:1:follow
+1) "news"
+2) "his"
+3) "it"
+4) "sports"
+127.0.0.1:6379> spop user:1:follow
+"news"
+127.0.0.1:6379> smembers user:1:follow
+1) "his"
+2) "it"
+3) "sports"
+127.0.0.1:6379> scard user:1:follow
+(integer) 3
+127.0.0.1:6379> sismember user:1:follow entertainment
+(integer) 0
+```
 
 ### 5.sdiff、sinter、sunion（集合间API）
 
@@ -798,7 +929,25 @@ SADD + SINTER = Social Graph
 
 ![zcard](F:\markdown\redis\images\RedisAPI\zset\zcard.png)
 
-![实战演示](F:\markdown\redis\images\RedisAPI\zset\实战演示.png)
+```shell
+127.0.0.1:6379> zadd player:rank 1000 james 900 kobe 800 wade 600 bosh
+(integer) 4
+127.0.0.1:6379> zscore player:rank bosh
+"600"
+127.0.0.1:6379> zcard player:rank
+(integer) 4
+127.0.0.1:6379> zrank player:rank james
+(integer) 3
+127.0.0.1:6379> zrem player:rank kobe
+(integer) 1
+127.0.0.1:6379> zrange player:rank 0 -1 withscores
+1) "bosh"
+2) "600"
+3) "wade"
+4) "800"
+5) "james"
+6) "1000"
+```
 
 ### 9.zrange
 

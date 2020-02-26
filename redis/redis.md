@@ -1037,7 +1037,7 @@ Jedis(String host,int port,int connectionTimeout,int soTimeout)
 - soTimeout：客户端读写超时    
 ```
 
-### 3.简单使用
+### 3. 简单使用
 
 ```java
 // 1.String
@@ -1047,5 +1047,189 @@ jedis.set("hello","world");
 jedis.get("hello");
 // 输出结果：1
 jedis.incr("counter");
+
+// 2.hash
+jedis.hset("myhash","f1","v1");
+jedis.hset("myhash","f2","v2");
+// 输出结果：{f1=v1,f2=v2}
+jedis.hgetAll("myhash");
+
+// 3.list
+jedis.rpush("mylist","1");
+jedis.rpush("mylist","2");
+jedis.rpush("mylist","3");
+// 输出结果：[1,2,3]
+jedis.lrange("mylist",0,-1);
+
+// 4.set
+jedis.sadd("myset","a");
+jedis.sadd("myset","b");
+jedis.sadd("myset","a");
+// 输出结果：[b,a]
+jedis.smembers("myset");
+
+// 5.zset
+jedis.zadd("myzset",99,"tom");
+jedis.zadd("myzset",66,"peter");
+jedis.zadd("myzset",33,"james");
+// 输出结果：[[["james"],33,0],["peter"],66,0],[["tom"],99,0]]
+jedis.zrangeWithScores("myzset",0,-1);
+```
+
+### 4. Jedis连接池使用
+
+#### （1）Jedis直连
+
+![Jedis直连](F:\markdown\redis\images\Redis客户端\Jedis直连.png)
+
+#### （2）Jedis连接池
+
+![Jedis连接池](F:\markdown\redis\images\Redis客户端\Jedis连接池.png)
+
+```java
+// 初始化Jedis连接池，通常来讲JedisPool是单例的。
+GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
+JedisPool jedisPool = new JedisPool(poolConfig,"127.0.0.1","6379");
+
+Jedis jedis = null;
+try{
+    // 1.从连接池获取jedis对象
+    jedis = jedisPool.getResource();
+    // 2.执行操作
+    jedis.set("hello","world");
+}catch(Exception e){
+    e.printStackTrace();
+}finally{
+    if(jedis != null){
+        // 如果使用JedisPool，close操作不是关闭连接，代表归还连接池
+        jedis.close();
+    }
+}
+```
+
+#### （3）方案对比
+
+##### （a）Jedis直连
+
+==优点：==
+
+- 简单方便
+- 适用于少量长期连接的场景
+
+==缺点：==
+
+- 存在每次新建/关闭TCP开销
+- 资源无法控制，存在连接泄露的可能
+- Jedis对象线程不安全
+
+##### （b）Jedis连接池
+
+==优点：==
+
+- Jedis预先生成，降低开销使用
+- 连接池的形式保护和控制资源的使用
+
+==缺点：==
+
+- 相对于直连接，使用相对麻烦，尤其在资源的管理上需要很多参数来保证，一旦规划不合理也会出现问题
+
+# 四、Redis其他功能
+
+## （一）慢查询
+
+### 1. 生命周期
+
+![慢查询生命周期](F:\markdown\redis\images\Redis其他功能\慢查询生命周期.png)
+
+### 2. slowlog-max-len
+
+1. 先进先出队列
+2. 固定长度
+3. 保存在内存中
+
+### 3. slowlog-log-slower-than
+
+1. 慢查询阈值（单位：微秒）
+2. slowlog-log-slower-than=0，记录所有命令
+3. slowlog-log-slower-than<0，不记录任何命令
+
+### 4. 配置方法
+
+1. 默认值
+
+- config get slowlog-max-len = 128
+- config get slowlog-log-slower-than = 10000
+
+2. 修改配置文件重启
+3. 动态配置
+
+- config set slowlog-max-len 1000
+- config set slowlog-log-slower-than 1000
+
+### 5. 慢查询命令
+
+1. slowlog get [n]：获取慢查询队列
+2. slowlog len：获取慢查询队列长度
+3. slowlog reset：清空慢查询队列
+
+### 6. 运维经验
+
+1. slowlog-max-len不要设置过大，默认10ms，通常设置1ms
+2. slowlog-log-slower-than不要设置过小，通常设置1000左右
+3. 理解命令的生命周期
+4. 定期持久化慢查询
+
+## （二）pipeline
+
+### 1. 什么是流水线
+
+![流水线](F:\markdown\redis\images\Redis其他功能\流水线.png)
+
+### 2. 流水线的作用
+
+| 命令   | N个命令操作       | 1次pipeline(n个命令) |
+| ------ | ----------------- | -------------------- |
+| 时间   | n次网络 + n次命令 | 1次网络 + n次命令    |
+| 数据量 | 1条命令           | n条命令              |
+
+1. Redis的命令时间是微秒级别的。
+2. pipeline每次条数要控制（网络）。
+
+### 3. pipeline-Jedis实现
+
+```xml
+<dependency>
+    <groupId>redis.clients</groupId>
+    <artifactId>jedis</artifactId>
+    <version>2.9.0</version>
+    <type>jar</type>
+    <scope>compile</scope>
+</dependency>
+```
+
+#### （1）没有pipeline
+
+```java
+Jedis jedis = new Jedis("127.0.0.1",6379);
+for(int i = 0;i < 10000;i++){
+    jedis.hset("hashkey:" + i,"field" + i,"value" + i);
+}
+
+1W hset --->  50s
+```
+
+#### （2）使用pipeline
+
+```java
+Jedis jedis = new Jedis("127.0.0.1",6379);
+for(int i = 0;i < 100;i++){
+    Pipeline pipeline = jedis.pipelined();
+    for(int j = i * 100;j < (i+1) * 100;j++){
+        pipeline.hset("hashkey:" + j,"field" + j,"value" + j);
+    }
+    pipeline.syncAndReturnAll();
+}
+
+1W hset --->  0.7s
 ```
 

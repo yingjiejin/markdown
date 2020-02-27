@@ -1233,3 +1233,172 @@ for(int i = 0;i < 100;i++){
 1W hset --->  0.7s
 ```
 
+### 4. 使用建议
+
+1. 注意每次pipeline携带数据量
+2. pipeline每次只能作用在一个Redis节点上
+3. M操作与pipeline区别
+
+## （三）发布订阅
+
+### 1. 角色
+
+- 发布者(publusher)
+- 订阅者(subscriber)
+- 频道(channel)
+
+### 2. 模型
+
+![发布订阅模型-1](F:\markdown\redis\images\Redis其他功能\发布订阅模型-1.png)
+
+![发布订阅模型-2](F:\markdown\redis\images\Redis其他功能\发布订阅模型-2.png)
+
+### 3. publish(发布命令)
+
+```shell 
+publish channel message
+```
+
+```shell
+redis> publish sohu:tv "hello world"
+(integer) 3 #订阅者个数
+redis> publish sohu:auto "taxi"
+(integer)
+```
+
+### 4. subscribe(订阅)
+
+```shell
+subscribe [channel] #一个或多个
+```
+
+```shell
+redis> subscribe sohu:tv
+1) "subscribe"
+2) "sohu:tv"
+3) (integer) 1
+1) "message"
+2) "sohu:tv"
+3) "hello world"
+```
+
+### 5. unsubscribe(取消订阅)
+
+```shell
+unsubscribe [channel] #一个或多个
+```
+
+```sh
+redis> unsubscribe sohu:tv
+1) "unsubscribe"
+2) "sohu:tv"
+3) (integer) 0
+```
+
+### 6. 其他API
+
+```shell
+1. psubscribe [pattern...]		# 订阅模式
+2. punsubscribe [pattern...]	# 退出指定的模式
+3. pubsub channels	# 列出至少有一个订阅者的频道
+4. pubsub numsub [channel...]	# 列出给定频道的订阅者数量
+5. pubsub numpat	# 列出被订阅模式的数量
+```
+
+![消息队列](F:\markdown\redis\images\Redis其他功能\消息队列.png)
+
+## （四）BitMap
+
+### 1. 位图
+
+![位图1](F:\markdown\redis\images\Redis其他功能\位图1.png)
+
+### 2. setbit
+
+```shell
+setbit key offset value
+# 给位图指定索引设置值
+```
+
+```shell
+127.0.0.1:6379> setbit unique:users:2016-04-05 0 1
+(integer) 0
+127.0.0.1:6379> setbit unique:users:2016-04-05 5 1
+(integer) 0
+127.0.0.1:6379> setbit unique:users:2016-04-05 11 1
+(integer) 0
+127.0.0.1:6379> setbit unique:users:2016-04-05 15 1
+(integer) 0
+127.0.0.1:6379> setbit unique:users:2016-04-05 19 1
+(integer) 0
+```
+
+![setbit](F:\markdown\redis\images\Redis其他功能\setbit.png)
+
+### 3. getbit
+
+```shell
+getbit key offset
+# 获取位图指定索引的值
+```
+
+```shell
+127.0.0.1:6379> getbit unique:users:2016-04-05 8
+(intege) 0
+127.0.0.1:6379> getbit unique:users:2016-04-05 19
+(integer) 1
+```
+
+### 4. bitcount
+
+```shell
+bitcount key [start end]
+# 获取位图指定范围(start到end，单位为字节，如果不指定就是获取全部)位置为1的个数
+```
+
+```shell
+127.0.0.1:6379> bitcount unique:users：2016-04-05
+(integer) 5
+127.0.0.1:6379> bitcount unique:users：2016-04-05 1 3
+(integer) 3
+```
+
+### 5. bitop
+
+```shell
+bitop op destkey key [key...]
+# 做多个Bitmap的and(交集)、or(并集)、not(非)、xor(异或)操作并将结果保存在destkey中
+```
+
+```shell
+# 求两个位图的并集
+127.0.0.1:6379> bitop and unique:users:and:2016_04_04-2016_04_05 unique:users:2016-04-05 unique:users:2016-04-04
+(integer) 3
+127.0.0.1:6379> bitcount unique:users:and:2016_04_04-2016_04_05
+(integer) 2
+```
+
+### 6. bitpos
+
+```shell
+bitpos key targetBit [start] [end]
+# 计算位图指定范围(start到end，单位为字节，如果不指定就是获取全部)第一个偏移量对应的值等于targetBit的位置
+```
+
+```shell
+127.0.0.1:6379> bitpos unique:users:2016-04-04 1
+(integer) 1
+127.0.0.1:6379> bitpos unique:users:2016-04-04 0 1 2
+(integer) 8
+```
+
+### 7. 使用经验
+
+1. type=string，最大512M
+2. 注意setbit时的偏移量，可能有较大耗时
+3. 位图不是绝对好
+
+## （五）HyperLogLog
+
+  
+

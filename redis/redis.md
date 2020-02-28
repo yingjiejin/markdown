@@ -1,4 +1,4 @@
-# 一、初识Redis
+# 、初识Redis
 
 - 高性能的Key-Value服务器
 - 多种数据结构
@@ -1400,5 +1400,192 @@ bitpos key targetBit [start] [end]
 
 ## （五）HyperLogLog
 
-  
+### 1. 概念
 
+1. 基于HyperLogLog算法：极小空间完成独立数量统计。
+2. 本质还是字符串
+
+```shell
+127.0.0.1:6379> type hyperloglog_key
+string
+```
+
+### 2. API
+
+```shell
+1. pfadd key element [element ...]：向hyperloglog添加元素
+2. pfcount key [key ...]：计算hyperloglog的独立总数
+3. pfmerge destkey sourcekey [sourcekey ...]：合并多个hyperloglog
+```
+
+```shell
+127.0.0.1:6379> pfadd 2017_03_06:unique:ids "uuid-1" "uuid-2" "uuid-3" "uuid-4"
+(integer) 1
+127.0.0.1:6379> pfcount 2017_03_06:unique:ids
+(integer) 4
+127.0.0.1:6379> pfadd 2017_03_06:unique:ids "uuid-1" "uuid-2" "uuid-3" "uuid-90"
+(integer) 1
+127.0.0.1:6379> pfcount 2017_03_06:unique:ids
+(integer) 5
+
+127.0.0.1:6379> pfadd 2016_03_06:unique:ids "uuid-1" "uuid-2" "uuid-3" "uuid-4"
+(integer) 1
+127.0.0.1:6379> pfcount 2016_03_06:unique:ids
+(integer) 4
+127.0.0.1:6379> pfadd 2017_03_05:unique:ids "uuid-4" "uuid-5" "uuid-6" "uuid-7"
+(integer) 1
+127.0.0.1:6379> pfcount 2016_03_05:unique:ids
+(integer) 4
+127.0.0.1:6379> pfmerge 2016_03_05_06:unique:ids 2016_03_05:unique:ids 2016_03_06:unique:ids
+(integer) 7
+```
+
+## （六）GEO
+
+### 1. geoadd
+
+```shell
+geo key longitude latitude	member [longitude latitude member ...] 
+# 增加地理位置信息
+```
+
+```shell
+127.0.0.1:6379> geoadd cities:locations 116.28 39.55 beijing
+(integer) 1
+127.0.0.1:6379> geoadd cities:locations 116.28 39.55 beijing
+(integer) 1
+127.0.0.1:6379> geoadd cities:locations 117.12 39.08 tianjin 114.29 38.02 shijiazhuang 118.01 39.38 tangshan 115.29 38.51 baoding
+(integer) 4
+```
+
+### 2. geopos
+
+```shell
+geopos key member [member ...]
+# 获取地理位置信息
+```
+
+```shell
+127.0.0.1:6379> geopos cities:locations tianjin
+1) 1) "117.12000042200088501"
+   2) "39.0800000535766543"
+```
+
+### 3. geodist
+
+```shell
+geodist key member1 member2 [unit]
+# 获取两个地理位置的距离
+# unit:m(米)、km(千米)、mi(英里)、ft(尺)
+```
+
+```shell
+127.0.0.1:6379> geodist cities:locations tianjin beijing km
+"89.2061"
+```
+
+### 4. georadius
+
+```shell
+georadius key longitude latitude radiusm|km|ft|mi [withcoord] [withdist] [withhash] [COUNT count] [asc|desc] [store key][storedist key]
+
+georadiusbymember key member  radiusm|km|ft|mi [withcoord]  [withdist] [withhash] [COUNT count] [asc|desc] [store key][storedist key]
+# 获取指定位置范围内的地理位置信息集合
+
+withcoord：返回结果中包含经纬度
+withdist：返回结果中包含距离中心节点位置
+withhash：返回结果中包含geohash
+COUNT count：指定返回结果的数量
+asc|desc：返回结果按照距离中心节点的距离做升序或者降序
+store key：将返回结果的地理位置信息保存到指定键
+storedist key：将返回结果距离中心节点的距离保存到指定键
+```
+
+```shell
+127.0.0.1:6379> georadiusbymember cities:locations beijing 150 km
+1) "beijing"
+2) "tianjin"
+3) "tangshan"
+4) "baoding"
+```
+
+# 五、Redis持久化
+
+## （一）持久化概述
+
+> redis所有数据保存在内存中，对数据的更新将异步地保存到磁盘上
+
+==持久化方式==
+
+![持久化方式](F:\markdown\redis\images\Redis持久化\持久化方式.png)
+
+## （二）RDB
+
+### 1. 什么是RDB
+
+![什么是RDB](F:\markdown\redis\images\Redis持久化\RDB\什么是RDB.png)
+
+> ==触发机制-主要三种方式==
+>
+> 1. save(同步)
+> 2. bgsave(异步)
+> 3. 自动
+
+### 2. save命令
+
+![save命令](F:\markdown\redis\images\Redis持久化\RDB\save命令1.png)
+
+![save命令2](F:\markdown\redis\images\Redis持久化\RDB\save命令2.png)
+
+![save命令3](F:\markdown\redis\images\Redis持久化\RDB\save命令3.png)
+
+### 3.  bgsave命令
+
+![bgsave命令1](F:\markdown\redis\images\Redis持久化\RDB\bgsave命令1.png)
+
+![bgsave命令2](F:\markdown\redis\images\Redis持久化\RDB\bgsave命令2.png)
+
+![bgsave命令3](F:\markdown\redis\images\Redis持久化\RDB\bgsave命令3.png)
+
+| 命令   | save             | bgsave               |
+| ------ | ---------------- | -------------------- |
+| IO类型 | 同步             | 异步                 |
+| 阻塞？ | 是               | 是（阻塞发生在fork） |
+| 复杂度 | O(n)             | O(n)                 |
+| 优点   | 不会消耗额外内存 | 不阻塞客户端命令     |
+| 缺点   | 阻塞客户端命令   | 需要fork，消耗内存   |
+
+### 4. 自动生成RDB
+
+![自动生成RDB1](F:\markdown\redis\images\Redis持久化\RDB\自动生成RDB1.png)
+
+#### （1）配置
+
+==配置==
+
+```shell
+save 900 1
+save 300 10
+save 60 10000
+dbfilename dump.rdb
+dir ./
+stop-writes-on-bgsave-error yes
+rdbcompression yes
+rdbchecksum yes
+```
+
+==最佳配置==
+
+```shell
+dbfilename dump-${port}.rdb
+dir /bigdiskpath
+stop-writes-on-bgsave-error yes
+rdbcompression yes
+rdbchecksum yes
+```
+
+#### （2）触发机制-不容忽略方式
+
+1. 全量复制
+2. debug reload
+3. shutdown

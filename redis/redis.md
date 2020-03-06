@@ -1,4 +1,4 @@
-# 、初识Redis
+# 一、初识Redis
 
 - 高性能的Key-Value服务器
 - 多种数据结构
@@ -21,9 +21,9 @@
 
 数据是存储在内存当中，C语言实现（50000 line），单线程
 
-![内存](F:\markdown\redis\images\初识redis\内存.png)
+![内存](redis.assets/内存-3464446.png)
 
-![](F:\markdown\redis\images\初识redis\内存2.png)
+### ![内存2](redis.assets/内存2.png)
 
 ### 2.持久化（断电不丢数据）
 
@@ -31,7 +31,7 @@ Redis所有数据保持在内存中，对数据的更新将异步地保存到磁
 
 ### 3.多种数据结构
 
-![多种数据结构](F:\markdown\redis\images\初识redis\多种数据结构.png)
+![多种数据结构](redis.assets/多种数据结构-3464577.png)
 
 - BitMaps：位图
 - HyperLogLog：超小内存唯一值计数
@@ -60,11 +60,11 @@ Redis所有数据保持在内存中，对数据的更新将异步地保存到磁
 
 ### 7.主从复制
 
-![主从复制](F:\markdown\redis\images\初识redis\主从复制.png)
+![主从复制](redis.assets/主从复制.png)
 
 ### 8.高可用、分布式
 
-![高可用分布式](F:\markdown\redis\images\初识redis\高可用分布式.png)
+![高可用分布式](redis.assets/高可用分布式-3464627.png)
 
 ## （二）Redis典型应用场景
 
@@ -77,23 +77,23 @@ Redis所有数据保持在内存中，对数据的更新将异步地保存到磁
 
 ### 1.缓存系统
 
-![缓存系统](F:\markdown\redis\images\初识redis\缓存系统.png)
+![缓存系统](redis.assets/缓存系统.png)
 
 ### 2.计数器
 
-![计数器](F:\markdown\redis\images\初识redis\计数器.png)
+![计数器](redis.assets/计数器.png)
 
 ### 3.消息队列系统
 
-![消息队列系统](F:\markdown\redis\images\初识redis\消息队列系统.png)
+![消息队列系统](redis.assets/消息队列系统.png)
 
 ### 4.排行榜
 
-![排行榜](F:\markdown\redis\images\初识redis\排行榜.png)
+![排行榜](redis.assets/排行榜.png)
 
 ### 5.社交网络
 
-![社交网络](F:\markdown\redis\images\初识redis\社交网络.png)
+![社交网络](redis.assets/社交网络.png)
 
 ## （三）Redis的三种启动方式介绍
 
@@ -149,13 +149,13 @@ Redis所有数据保持在内存中，对数据的更新将异步地保存到磁
 
 ### 4.Redis客户端连接
 
-![redis连接](F:\markdown\redis\images\初识redis\redis连接.png)
+![redis连接](redis.assets/redis连接.png)
 
 ### 5.Redis客户端返回值
 
-![redis返回值1](F:\markdown\redis\images\初识redis\redis返回值1.png)
+![redis返回值1](redis.assets/redis返回值1.png)
 
-![redis返回值2](F:\markdown\redis\images\初识redis\redis返回值2.png)
+![redis返回值2](redis.assets/redis返回值2.png)
 
 ## （四）Redis常用配置
 
@@ -357,15 +357,15 @@ set
 
 ## （二）数据结构与内部编码
 
-![数据结构与内部编码](F:\markdown\redis\images\RedisAPI\数据结构与内部编码.png)
+![数据结构与内部编码](redis.assets/数据结构与内部编码-3464854.png)
 
 - RedisObject
 
-![redisObject](F:\markdown\redis\images\RedisAPI\redisObject.png)
+![redisObject](redis.assets/redisObject.png)
 
 ## （三）单线程
 
-![Redis单线程1](F:\markdown\redis\images\RedisAPI\Redis单线程1.png)
+![Redis单线程1](redis.assets/Redis单线程1.png)
 
 > 单线程为什么这么快？
 >
@@ -373,13 +373,13 @@ set
 > 2. 非阻塞IO
 > 3. 避免线程切换和竞态消耗 
 
-![单线程模型](F:\markdown\redis\images\RedisAPI\单线程模型.png)
+![单线程模型](redis.assets/单线程模型.png)
 
 ## （四）字符串
 
 ### 1.字符串键值结构
 
-![字符串键值结构](F:\markdown\redis\images\RedisAPI\String\字符串键值结构.png)
+![字符串键值结构](redis.assets/字符串键值结构.png)
 
 ### 2.使用场景
 
@@ -463,7 +463,7 @@ public VideoInfo get(long id){
 
 #### （2）分布式id生成器
 
-![redis分布式id生成器](F:\markdown\redis\images\RedisAPI\String\redis分布式id生成器.png)
+![redis分布式id生成器](redis.assets/redis分布式id生成器.png)
 
 ### 6. set、setnx、setxx
 
@@ -524,9 +524,9 @@ OK
 
 ### 8.n次get 和 1次mget
 
-![n次get](F:\markdown\redis\images\RedisAPI\String\n次get.png)
+![n次get](redis.assets/n次get.png)
 
-![1次mget](F:\markdown\redis\images\RedisAPI\String\1次mget.png)
+![1次mget](redis.assets/1次mget-3464985.png)
 
 ### 9.getset、append、strlen
 
@@ -603,7 +603,7 @@ OK
 
 ### 1.哈希键值结构
 
-![哈希键值结构](F:\markdown\redis\images\RedisAPI\hash\哈希键值结构.png)
+![哈希键值结构](redis.assets/哈希键值结构.png)
 
  ### 2.hget、hset、hdel
 
@@ -735,61 +735,63 @@ hkeys key		时间复杂度o(n)
 3) "page"
 ```
 
+### 7.String和hash相似API
+
+![String和hash相似API](redis.assets/String和hash相似API.png)
+
 ## （六）list
 
  ### 1.列表结构(有序，可重复，两边插入弹出)
 
-![列表结构1](F:\markdown\redis\images\RedisAPI\list\列表结构1.png)
+##![列表结构1](redis.assets/列表结构1.png) 
 
-## 
-
-![列表结构2](F:\markdown\redis\images\RedisAPI\list\列表结构2.png)
+![列表结构2](redis.assets/列表结构2.png)
 
 ### 2.rpush
 
-![rpush](F:\markdown\redis\images\RedisAPI\list\rpush.png)
+![rpush](redis.assets/rpush.png)
 
 ### 3.lpush
 
-![lpush](F:\markdown\redis\images\RedisAPI\list\lpush.png)
+![lpush](redis.assets/lpush.png)
 
 ### 4.linsert
 
-![linsert](F:\markdown\redis\images\RedisAPI\list\linsert.png)
+![linsert](redis.assets/linsert-3465357.png)
 
 ### 5.lpop
 
-![lpop](F:\markdown\redis\images\RedisAPI\list\lpop.png)
+![lpop](redis.assets/lpop.png)
 
 ### 6.rpop
 
-![rpop](F:\markdown\redis\images\RedisAPI\list\rpop.png)
+![rpop](redis.assets/rpop.png)
 
 ### 7.lrem
 
-![lrem](F:\markdown\redis\images\RedisAPI\list\lrem.png)
+![lrem](redis.assets/lrem.png)
 
 ### 8.ltrim
 
-![ltrim](F:\markdown\redis\images\RedisAPI\list\ltrim.png)
+![ltrim](redis.assets/ltrim.png)
 
 ### 9.lrange
 
-![lrange1](F:\markdown\redis\images\RedisAPI\list\lrange1.png)
+![lrange1](redis.assets/lrange1.png)
 
-![lrange2](F:\markdown\redis\images\RedisAPI\list\lrange2.png)
+![lrange2](redis.assets/lrange2.png)
 
 ### 10.lindex
 
-![lindex](F:\markdown\redis\images\RedisAPI\list\lindex.png)
+![lindex](redis.assets/lindex.png)
 
 ### 11.llen
 
-![llen](F:\markdown\redis\images\RedisAPI\list\llen.png)
+![llen](redis.assets/llen.png)
 
 ### 12.lset
 
-![lset](F:\markdown\redis\images\RedisAPI\list\lset.png)
+![lset](redis.assets/lset.png)
 
 ### 13.操作
 
@@ -836,9 +838,9 @@ brpop key timeout		时间复杂度o(1)
 
 ### 1.集合结构
 
-![集合结构](F:\markdown\redis\images\RedisAPI\set\集合结构-1.png)
+![集合结构-1](redis.assets/集合结构-1.png)
 
-![集合结构-2](F:\markdown\redis\images\RedisAPI\set\集合结构-2.png)
+![集合结构-2](redis.assets/集合结构-2.png)
 
 ### 2.sadd、srem
 
@@ -852,7 +854,7 @@ srem key element		时间复杂度o(1)
 
 ### 3.scard、sismember、srandmember、smember
 
-![scard、sismember、srandmemeber、smemeber](F:\markdown\redis\images\RedisAPI\set\scard、sismember、srandmemeber、smemeber.png)
+![scard、sismember、srandmemeber、smemeber](redis.assets/scard、sismember、srandmemeber、smemeber.png)
 
 > smember：无序、小心使用（全部取出）
 >
@@ -885,7 +887,7 @@ srem key element		时间复杂度o(1)
 
 ### 5.sdiff、sinter、sunion（集合间API）
 
-![sdiff、sinter、sunion](F:\markdown\redis\images\RedisAPI\set\sdiff、sinter、sunion.png)
+![sdiff、sinter、sunion](redis.assets/sdiff、sinter、sunion.png)
 
 ### 6.TIPS
 
@@ -899,35 +901,35 @@ SADD + SINTER = Social Graph
 
 ### 1.有序集合结构
 
-![有序集合结构](F:\markdown\redis\images\RedisAPI\zset\有序集合结构.png)
+![有序集合结构](redis.assets/有序集合结构.png)
 
 ### 2.集合VS有序集合
 
-![集合VS有序集合-1](F:\markdown\redis\images\RedisAPI\zset\集合VS有序集合-1.png)
+![集合VS有序集合-1](redis.assets/集合VS有序集合-1.png)
 
 ### 3.列表VS有序集合
 
-![列表VS有序集合](F:\markdown\redis\images\RedisAPI\zset\列表VS有序集合.png)
+![列表VS有序集合](redis.assets/列表VS有序集合.png)
 
 ### 4.zadd
 
-![zadd](F:\markdown\redis\images\RedisAPI\zset\zadd.png)
+![zadd](redis.assets/zadd-3465709.png)
 
 ### 5.zrem
 
-![zrem](F:\markdown\redis\images\RedisAPI\zset\zrem.png)
+![zrem](redis.assets/zrem.png)
 
 ### 6.zscore
 
-![zscore](F:\markdown\redis\images\RedisAPI\zset\zscore.png)
+![zscore](redis.assets/zscore.png)
 
 ### 7.zincrby
 
-![zincrby](F:\markdown\redis\images\RedisAPI\zset\zincrby.png)
+![zincrby](redis.assets/zincrby.png)
 
 ### 8.zcard
 
-![zcard](F:\markdown\redis\images\RedisAPI\zset\zcard.png)
+![zcard](redis.assets/zcard.png)
 
 ```shell
 127.0.0.1:6379> zadd player:rank 1000 james 900 kobe 800 wade 600 bosh
@@ -951,23 +953,23 @@ SADD + SINTER = Social Graph
 
 ### 9.zrange
 
-![zrange](F:\markdown\redis\images\RedisAPI\zset\zrange.png)
+![zrange](redis.assets/zrange.png)
 
 ### 10.zrangebyscore
 
-![zrangebyscore](F:\markdown\redis\images\RedisAPI\zset\zrangebyscore.png)
+![zrangebyscore](redis.assets/zrangebyscore.png)
 
 ### 11.zcount
 
-![zcount](F:\markdown\redis\images\RedisAPI\zset\zcount.png)
+![zcount](redis.assets/zcount.png)
 
 ### 12.zremrangebyrank
 
-![zremrangebyrank](F:\markdown\redis\images\RedisAPI\zset\zremrangebyrank.png)
+![zremrangebyrank](redis.assets/zremrangebyrank.png)
 
 ### 13.zremrangebyscore
 
-![zremrangebyscore](F:\markdown\redis\images\RedisAPI\zset\zremrangebyscore.png)
+![zremrangebyscore](redis.assets/zremrangebyscore.png)
 
 ```shell
 127.0.0.1:6379> zadd player:rank 1000 ronaldo 900 messi 800 c-ronaldo 600 kaka
@@ -1080,11 +1082,11 @@ jedis.zrangeWithScores("myzset",0,-1);
 
 #### （1）Jedis直连
 
-![Jedis直连](F:\markdown\redis\images\Redis客户端\Jedis直连.png)
+![Jedis直连](redis.assets/Jedis直连.png)
 
 #### （2）Jedis连接池
 
-![Jedis连接池](F:\markdown\redis\images\Redis客户端\Jedis连接池.png)
+![Jedis连接池](redis.assets/Jedis连接池.png)
 
 ```java
 // 初始化Jedis连接池，通常来讲JedisPool是单例的。
@@ -1139,7 +1141,7 @@ try{
 
 ### 1. 生命周期
 
-![慢查询生命周期](F:\markdown\redis\images\Redis其他功能\慢查询生命周期.png)
+![慢查询生命周期](redis.assets/慢查询生命周期.png)
 
 ### 2. slowlog-max-len
 
@@ -1183,7 +1185,7 @@ try{
 
 ### 1. 什么是流水线
 
-![流水线](F:\markdown\redis\images\Redis其他功能\流水线.png)
+![流水线](redis.assets/流水线.png)
 
 ### 2. 流水线的作用
 
@@ -1249,9 +1251,9 @@ for(int i = 0;i < 100;i++){
 
 ### 2. 模型
 
-![发布订阅模型-1](F:\markdown\redis\images\Redis其他功能\发布订阅模型-1.png)
+![发布订阅模型-1](redis.assets/发布订阅模型-1.png)
 
-![发布订阅模型-2](F:\markdown\redis\images\Redis其他功能\发布订阅模型-2.png)
+![发布订阅模型-2](redis.assets/发布订阅模型-2.png)
 
 ### 3. publish(发布命令)
 
@@ -1305,13 +1307,13 @@ redis> unsubscribe sohu:tv
 5. pubsub numpat	# 列出被订阅模式的数量
 ```
 
-![消息队列](F:\markdown\redis\images\Redis其他功能\消息队列.png)
+![消息队列](redis.assets/消息队列.png)
 
 ## （四）BitMap
 
 ### 1. 位图
 
-![位图1](F:\markdown\redis\images\Redis其他功能\位图1.png)
+![位图](redis.assets/位图.png)
 
 ### 2. setbit
 
@@ -1333,7 +1335,7 @@ setbit key offset value
 (integer) 0
 ```
 
-![setbit](F:\markdown\redis\images\Redis其他功能\setbit.png)
+![setbit](redis.assets/setbit.png)
 
 ### 3. getbit
 
@@ -1517,13 +1519,13 @@ storedist key：将返回结果距离中心节点的距离保存到指定键
 
 ==持久化方式==
 
-![持久化方式](F:\markdown\redis\images\Redis持久化\持久化方式.png)
+![持久化方式](redis.assets/持久化方式-3466104.png)
 
 ## （二）RDB
 
 ### 1. 什么是RDB
 
-![什么是RDB](F:\markdown\redis\images\Redis持久化\RDB\什么是RDB.png)
+![什么是RDB](redis.assets/什么是RDB.png)
 
 > ==触发机制-主要三种方式==
 >
@@ -1533,19 +1535,19 @@ storedist key：将返回结果距离中心节点的距离保存到指定键
 
 ### 2. save命令
 
-![save命令](F:\markdown\redis\images\Redis持久化\RDB\save命令1.png)
+![save命令1](redis.assets/save命令1.png)
 
-![save命令2](F:\markdown\redis\images\Redis持久化\RDB\save命令2.png)
+![save命令2](redis.assets/save命令2.png)
 
-![save命令3](F:\markdown\redis\images\Redis持久化\RDB\save命令3.png)
+![save命令3](redis.assets/save命令3.png)
 
 ### 3.  bgsave命令
 
-![bgsave命令1](F:\markdown\redis\images\Redis持久化\RDB\bgsave命令1.png)
+![bgsave命令1](redis.assets/bgsave命令1.png)
 
-![bgsave命令2](F:\markdown\redis\images\Redis持久化\RDB\bgsave命令2.png)
+![bgsave命令2](redis.assets/bgsave命令2.png)
 
-![bgsave命令3](F:\markdown\redis\images\Redis持久化\RDB\bgsave命令3.png)
+![bgsave命令3](redis.assets/bgsave命令3.png)
 
 | 命令   | save             | bgsave               |
 | ------ | ---------------- | -------------------- |
@@ -1557,7 +1559,7 @@ storedist key：将返回结果距离中心节点的距离保存到指定键
 
 ### 4. 自动生成RDB
 
-![自动生成RDB1](F:\markdown\redis\images\Redis持久化\RDB\自动生成RDB1.png)
+![自动生成RDB1](redis.assets/自动生成RDB1.png)
 
 #### （1）配置
 

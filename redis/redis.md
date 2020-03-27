@@ -1591,3 +1591,205 @@ rdbchecksum yes
 1. 全量复制
 2. debug reload
 3. shutdown
+
+## （三）AOF
+
+### 1. RDB问题
+
+- 耗时、耗性能
+- 不可控、丢失数据
+
+### 2. 什么是AOF
+
+![image-20200313162442567](redis.assets/image-20200313162442567.png)
+
+![image-20200313162523148](redis.assets/image-20200313162523148.png)
+
+### 3. AOF的三种策略
+
+- always
+- everysec
+- no
+
+#### （1）always
+
+![image-20200314115658923](redis.assets/image-20200314115658923.png)
+
+#### （2）everysec
+
+![image-20200314115841148](redis.assets/image-20200314115841148.png)
+
+#### （3）no
+
+![image-20200314115905044](redis.assets/image-20200314115905044.png)
+
+#### （4）always、everysec、no
+
+| 命令 | always                              | everysec               | no     |
+| ---- | ----------------------------------- | ---------------------- | ------ |
+| 优点 | 不丢失数据                          | 每秒一次fsync丢1秒数据 | 不用管 |
+| 缺点 | IO开销较大，一般的sata盘只有几百TPS | 丢1秒数据              | 不可控 |
+
+### 4、AOF重写
+
+![image-20200314120745412](redis.assets/image-20200314120745412.png)
+
+#### （1）AOF重写作用
+
+> - 减少磁盘占用量
+> - 加速恢复速度
+
+#### （2）AOF重写实习两种方式
+
+- bgrewriteaof
+- AOF重写配置
+
+#### （3）bgrewriteaof命令
+
+![image-20200314121707613](redis.assets/image-20200314121707613.png)
+
+#### （4）AOF重写配置
+
+![image-20200314121851640](redis.assets/image-20200314121851640.png)
+
+![image-20200314121948397](redis.assets/image-20200314121948397.png)
+
+#### （5）AOF重写流程
+
+![image-20200314122043207](redis.assets/image-20200314122043207.png)
+
+#### （6）配置
+
+```shell
+appendonly yes
+appendfilename "appendonly-${port}.aof"
+appendfsync everysec
+dir /bigdiskpath
+no-appendfsync-on-rewrite yes
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+```
+
+## （四）Redis持久化的取舍和选择
+
+### 1. RDB和AOF
+
+| 命令       | RDB    | AOF          |
+| ---------- | ------ | ------------ |
+| 启动优先级 | 低     | 高           |
+| 体积       | 小     | 大           |
+| 恢复速度   | 快     | 慢           |
+| 数据安全性 | 丢数据 | 根据策略决定 |
+| 轻重       | 重     | 轻           |
+
+### 2. 最佳策略
+
+- 小分片
+- 缓存或者存储
+
+# 六、常见的持久化开发运维问题
+
+1. fork操作
+2. 进程外开销
+3. AOF追加阻塞
+4. 单机多实例部署
+
+## （一）fork操作
+
+1. 同步操作
+2. 与内存量息息相关：内存越大，耗时越长（与机器类型有关）
+3. info：latest_fork_usec
+
+==改善fork==
+
+1. 优先使用物理机或者高效支持fork操作的虚拟化技术
+2. 控制Redis实例最大可用内存：maxmemory
+3. 合理配置Linux内存分配策略vm.overcommit_memory=1
+4. 降低fork频率：例如放宽AOF重写自动触发时机，不必要的全量复制
+
+## （二）子进程开销和优化
+
+1. CPU：
+   1. 开销：RDB和AOF文件生成，属于CPU密集型
+   2. 优化：不做CPU绑定，不和CPU密集型部署
+2. 内存
+   1. 开销：fork内存开销，copy-on-write
+   2. 优化：echo never > /sys/kernel/mm/transparent_hugepage/enable
+3. 硬盘
+   1. 开销：AOF和RDB文件写入，可用结合iostat，iotop分析
+
+==硬盘优化==
+
+1. 不要和高硬盘负载服务部署一起：存储服务、消息队列等
+2. no-appendfsync-on-rewrite = yes
+3. 根据写入量决定磁盘类型：例如ssd
+4. 单机多实例持久化文件目录可以考虑分盘
+
+## （三）AOF追加阻塞
+
+![image-20200315173646395](redis.assets/image-20200315173646395.png)
+
+==AOF阻塞定位==
+
+1. Redis日志：
+
+Asynchronous AOF fsync is taking too long (disk is busy?).
+
+Writing the AOF buffer without waiting for fsync to complete, this may slow down Redis
+
+2. info Persistence
+
+127.0.0.1:6379> info persistence
+
+……
+
+……
+
+aof_delayed_fsync: 100
+
+# 七、Redis复制的原理与优化
+
+## （一）主从复制的作用
+
+![image-20200317104632609](redis.assets/image-20200317104632609.png)
+
+![image-20200317104755249](redis.assets/image-20200317104755249.png)
+
+![image-20200317104922639](redis.assets/image-20200317104922639.png)
+
+1. 一个master可以有多个slave
+2. 一个slave只能有一个master
+
+## （二）主从复制的配置
+
+- slaveof命令
+- 配置
+
+### 1. 命令实现
+
+![image-20200318102233125](redis.assets/image-20200318102233125.png)
+
+==取消复制==
+
+![image-20200318102434875](redis.assets/image-20200318102434875.png)
+
+### 2. 配置
+
+```shell
+slaveof ip port
+slave-read-only yes
+```
+
+### 3. 比较
+
+| 方式 | 命令       | 配置     |
+| ---- | ---------- | -------- |
+| 优点 | 无需重启   | 统一配置 |
+| 缺点 | 不便于管理 | 需要重启 |
+
+## （三）run_id和复制偏移量
+
+```shell
+redic-cli -p 6379 info server | grep run 
+```
+

@@ -1687,14 +1687,14 @@ auto-aof-rewrite-min-size 64mb
 - 小分片
 - 缓存或者存储
 
-# 六、常见的持久化开发运维问题
+## （五）常见的持久化开发运维问题
 
 1. fork操作
 2. 进程外开销
 3. AOF追加阻塞
 4. 单机多实例部署
 
-## （一）fork操作
+### 1. fork操作
 
 1. 同步操作
 2. 与内存量息息相关：内存越大，耗时越长（与机器类型有关）
@@ -1707,7 +1707,7 @@ auto-aof-rewrite-min-size 64mb
 3. 合理配置Linux内存分配策略vm.overcommit_memory=1
 4. 降低fork频率：例如放宽AOF重写自动触发时机，不必要的全量复制
 
-## （二）子进程开销和优化
+### 2. 子进程开销和优化
 
 1. CPU：
    1. 开销：RDB和AOF文件生成，属于CPU密集型
@@ -1725,7 +1725,7 @@ auto-aof-rewrite-min-size 64mb
 3. 根据写入量决定磁盘类型：例如ssd
 4. 单机多实例持久化文件目录可以考虑分盘
 
-## （三）AOF追加阻塞
+### 3. AOF追加阻塞
 
 ![image-20200315173646395](redis.assets/image-20200315173646395.png)
 
@@ -1747,7 +1747,7 @@ Writing the AOF buffer without waiting for fsync to complete, this may slow down
 
 aof_delayed_fsync: 100
 
-# 七、Redis复制的原理与优化
+# 六、Redis复制的原理与优化
 
 ## （一）主从复制的作用
 
@@ -1791,5 +1791,216 @@ slave-read-only yes
 
 ```shell
 redic-cli -p 6379 info server | grep run 
+
+redic-cli -p 6379 info replication
+master_repl_offset:1950
 ```
+
+## （四）全量复制
+
+![image-20200402140154278](redis.assets/image-20200402140154278.png)
+
+### 1. 全量复制开销
+
+1. bgsave时间
+2. RDB文件网络传输时间
+3. 从节点清空数据时间
+4. 从节点加载RDB的时间
+5. 可能的AOF重写时间
+
+### 2. 部分复制
+
+![image-20200402140755123](redis.assets/image-20200402140755123.png)
+
+## （五）故障及常见问题
+
+### 1. 故障
+
+#### 1. slave宕机
+
+![image-20200402141154608](redis.assets/image-20200402141154608.png)
+
+#### 2. master宕机
+
+![image-20200402141334566](redis.assets/image-20200402141334566.png)
+
+### 2. 开发及运维常见问题
+
+1. 读写分离
+2. 主从配置不一致
+3. 规避全量复制
+4. 规避复制风暴
+
+#### 1. 读写分离
+
+![image-20200402142348070](redis.assets/image-20200402142348070.png)
+
+==1.读写分离：读流量分摊到从节点。==
+
+==可能遇到问题：==
+
+- 复制数据延迟
+- 读到过期数据
+- 从节点故障
+
+#### 2. 主从配置不一致
+
+- 例如maxmemory不一致：丢失数据
+- 例如数据结构优化参数（hash-max-ziplist-entries）：内存不一致
+
+#### 3. 规避全量复制
+
+1. 第一次全量复制
+   - 第一次不可避免
+   - 小主节点、低峰
+2. 节点运行ID不匹配
+   - 主节点重启（运行ID变化）
+   - 故障转移，例如哨兵或集群
+3. 复制积压缓冲区不足
+   - 网络中断，部分复制无法满足
+   - 增大复制缓冲区配置rel_backlog_size，网络“增强”
+
+#### 4. 规避复制风暴
+
+![image-20200402145046998](redis.assets/image-20200402145046998.png)
+
+# 七、Redis Sentinel
+
+## （一）Redis Sentinel架构
+
+![image-20200403094735079](redis.assets/image-20200403094735079.png)
+
+![image-20200403094936067](redis.assets/image-20200403094936067.png)
+
+![image-20200403095034118](redis.assets/image-20200403095034118.png)
+
+## （二）安装与配置
+
+1. 配置开启主从节点
+2. 配置开启sentinel监控主节点。（sentinel是特殊的redis）
+3. 实际应该是多机器
+4. 详细配置节点
+
+![image-20200403095824722](redis.assets/image-20200403095824722.png)
+
+### 1. Redis主节点
+
+```shell
+# 启动
+redis-server redis-7000.conf
+
+# 配置
+port 7000
+daemonize yes
+pidfile /var/run/redis-7000.pid
+logfile "7000.log"
+dir "/opt/soft/redis/data/"
+```
+
+### 2. Redis从节点
+
+```shell
+# 启动
+redis-server redis-7001.conf
+redis-server redis-7002.conf
+
+# slave-1
+port 7000
+daemonize yes
+pidfile /var/run/redis-7001.pid
+logfile "7001.log"
+dir "/opt/soft/redis/data/"
+slaveof 127.0.0.1 7000
+
+#slave-2
+port 7000
+daemonize yes
+pidfile /var/run/redis-7002.pid
+logfile "7002.log"
+dir "/opt/soft/redis/data/"
+slaveof 127.0.0.1 7000
+```
+
+### 3. sentinel主要配置
+
+```shell
+port ${port}
+dir "/opt/soft/redis/data/"
+logfile "${port}.log"
+sentinel monitor mymaster 127.0.0.1 7000 2
+sentinel down-after-milliseconds mymaster 30000
+sentinel parallel-syncs mymaster 1
+sentinel failover-timeout mymaster 180000
+```
+
+# （三）java客户端
+
+### 1. 客户端实现基本原理-step1
+
+![image-20200408143834477](redis.assets/image-20200408143834477.png)
+
+### 2. 客户端实现基本原理-step2
+
+![image-20200408143950566](redis.assets/image-20200408143950566.png)
+
+### 3. 客户端实现基本原理-step3
+
+![image-20200408144321637](redis.assets/image-20200408144321637.png)
+
+### 4. 客户端实现基本原理-step4
+
+![image-20200408144408834](redis.assets/image-20200408144408834.png)
+
+### 5. 客户端接入流程
+
+1. Sentinel地址集合
+2. masterName
+3. 不是代理模式
+
+### 6. jedis
+
+```java
+JedisSentinelPool sentinelPool = new JedisSentinelPool(masterName,sentinelSet,poolConfig,timeout);
+Jedis jedis = null;
+try {
+  jedis = redisSentinelPool.getResource();
+  // jedis command
+} catch(Exception e) {
+  logger.error(e.getMessage(),e);
+} finally {
+  if(jedi != null){
+    jedis.close();
+  }
+}
+```
+
+### 7. 三个定时任务
+
+1. 每10秒每个sentinel对master和slave执行info
+   - 发现slave节点
+   - 确认主从关系
+2. 每2秒每个sentinel通过master节点的channel交换信息（pub/sub）
+   - 通过_sentinel _:hello频道交互
+   - 交互对节点的“看法” 和自身信息
+3. 每1秒每个sentinel对其它sentinel和redis进行ping
+   - 心跳检测，失败判定依据
+
+### 8. 主观下线和客观下线
+
+```shell
+sentinel monitor <masterName> <ip> <port> <quorum>
+sentinel monitor myMaster 127.0.0.1 6379 2
+sentinel down-after-millisenconds <masterName> <timeout>
+sentinel down-after-millisenconds mymaster 30000
+```
+
+- 主观下线：每个sentinel节点对Redis节点失败的“偏见”
+
+- 客观下线：所有sentinel节点对Redis节点失败“达成共识”（超过quorum个统一）
+
+  sentinel is-master-down-by-addr
+
+### 9. 领导者选举
+
+
 
